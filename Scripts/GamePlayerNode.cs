@@ -1,0 +1,135 @@
+// Isaac Bustad
+// 5/20/2025
+
+
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+namespace BugFreeProductions.Tools
+{
+    // Input Bridge
+    public class GamePlayerNode : MonoBehaviour
+    {
+        // Vars
+        [SerializeField] protected Camera nodeCamera = null;
+
+        // boolion for if node is player character
+        protected bool isPlayerCharacter = false;
+
+        // stored input value
+        protected Vector3 moveDir = Vector3.zero;
+
+        // player context references
+        protected Rigidbody rb = null;
+        
+        // store input collector
+        protected SinglePlayerInputCollector singlePlayerInputCollector = null;
+
+        // store game mode node
+        protected GameModeNode gameModeNode = null;
+
+        // Methods
+        protected virtual void OnEnable()
+        {
+            CollectVars();
+        }
+
+        protected virtual void CollectVars()
+        {
+            rb = GetComponent<Rigidbody>();
+        }
+
+        #region Camera Management
+
+        #endregion
+
+        #region Input Management
+        #region ForPrimary gameplay Buttons
+        // expect button callback
+        public virtual void PrimaryButtonPress(InputAction.CallbackContext aCON)
+        {
+
+        }
+
+
+        // expect button callback
+        public virtual void SecondaryButtonPress(InputAction.CallbackContext aCON)
+        {
+
+        }
+
+        // expext callback context
+        public virtual void FourWayInput(InputAction.CallbackContext aCON)
+        {
+            Vector2 rVal = aCON.ReadValue<Vector2>();
+            moveDir = new Vector3(rVal.x, 0, rVal.y);
+        }
+        #endregion
+
+        #region AuxButtons for extra functionality
+        // expect button callback
+        public virtual void AuxButtonPress(InputAction.CallbackContext aCON)
+        {
+
+        }
+
+        // expect button callback
+        public virtual void PositiveAuxButtonPress(InputAction.CallbackContext aCON)
+        {
+
+        }
+
+        // expect button callback
+        public virtual void NegativeAuxButtonPress(InputAction.CallbackContext aCON)
+        {
+
+        }
+        #endregion
+
+
+
+        #endregion
+
+        #region Computer Player Toggle
+        protected void ChangeIsPlayerCharacter(bool aIPA)
+        {
+            ComputerPlayerBridge cpb = GetComponent<ComputerPlayerBridge>();
+
+            if (cpb != null)
+            {
+                cpb.IsPlayerCharacter = aIPA;
+            }
+        }
+        #endregion
+
+        #region Destroy
+        protected virtual void OnDestroy()
+        {
+
+        }
+
+        #endregion 
+
+        // Accessors
+        public bool IsPlayerCharacter {  set { isPlayerCharacter = value; ChangeIsPlayerCharacter(value); } }
+        public Camera NodeCamera { get { return nodeCamera; } }
+        public Vector3 MovDir { get { return moveDir; } }
+
+        public SinglePlayerInputCollector SinglePlayerInputCollector { get { return singlePlayerInputCollector; } set { singlePlayerInputCollector = value; } }
+        
+        public GameModeNode GameModeNode 
+        { 
+            get 
+            { 
+                if (gameModeNode == null) 
+                { 
+                    gameModeNode = GetComponentInParent<GameModeNode>(); 
+                } 
+                return gameModeNode; 
+            } 
+        }
+    }
+}
