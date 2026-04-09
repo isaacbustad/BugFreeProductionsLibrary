@@ -4,6 +4,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using BugFreeProductions.Tools;
 using UnityEngine;
 
 namespace BugFreeProductions.Tools2D
@@ -46,7 +47,7 @@ namespace BugFreeProductions.Tools2D
         protected CharacterMoveStateType2D lastMoveStateType2D = CharacterMoveStateType2D.Idle;
 
         // reference for playerInputNode2D
-        protected PlayerInputNode playerInputNode2D = null;
+        protected GamePlayerNode playerInputNode = null;
 
         // reference for Rigidbody2D
         protected Rigidbody2D rb2D = null;
@@ -69,7 +70,7 @@ namespace BugFreeProductions.Tools2D
             currentState = idleState;
 
             // get reference to playerInputNode2D
-            playerInputNode2D = GetComponent<PlayerInputNode>();
+            playerInputNode = GetComponent<GamePlayerNode>();
 
             // get reference to Rigidbody2D
             rb2D = GetComponent<Rigidbody2D>();
