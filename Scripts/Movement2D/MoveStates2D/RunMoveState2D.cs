@@ -19,7 +19,7 @@ namespace BugFreeProductions.Tools2D
         #region Methods
         protected override void MoveCharacter()
         {
-            if (context.RB2D.velocity.magnitude < context.RunStateParam2D.MaxSpeed)
+            if (context.RB2D.linearVelocity.magnitude < context.RunStateParam2D.MaxSpeed)
             {
                 //context.RB2D.AddForce(context)
             }

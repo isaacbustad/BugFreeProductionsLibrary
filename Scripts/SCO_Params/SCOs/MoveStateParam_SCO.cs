@@ -7,8 +7,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-[CreateAssetMenu(fileName = "MoveState_SCO", menuName = "ScriptableObject/MoveState_SCO", order = 0)]
-public class MoveState_SCO : ScriptableObject
+[CreateAssetMenu(fileName = "MoveState_SCO", menuName = "ScriptableObject/MoveStateParam_SCO", order = 0)]
+public class MoveStateParam_SCO : ScriptableObject
 {
     // Vars
     [SerializeField]

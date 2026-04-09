@@ -9,8 +9,8 @@ using UnityEngine;
 
 namespace BugFreeProductions.ArcadeRacer
 {
-    [CreateAssetMenu(fileName = "RacerCamState_SCO",menuName = "ScriptableObject/RacerCamState_SCO")]
-    public class RacerCamState_SCO : ScriptableObject
+    [CreateAssetMenu(fileName = "RacerCamState_SCO",menuName = "ScriptableObject/CamStateParam_SCO")]
+    public class CamStateParam_SCO : ScriptableObject
     {
         // Vars
         [SerializeField] protected Vector3 camToSet = Vector3.zero;

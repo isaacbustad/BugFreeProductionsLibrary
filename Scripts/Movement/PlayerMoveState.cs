@@ -23,7 +23,7 @@ namespace BugFreeProductions.Party
         // moves the player bassed on player state
         protected virtual void Move(PlayerMoveContext aPMC)
         {
-            if (aPMC.RB.velocity.magnitude < 10)
+            if (aPMC.RB.linearVelocity.magnitude < 10)
             {
                 aPMC.RB.AddForce(aPMC.PlayerNode.MovDir.normalized * 50);
             }
@@ -32,7 +32,7 @@ namespace BugFreeProductions.Party
 
         protected virtual void LimmitVel(PlayerMoveContext aPMC)
         {
-            BugFreeTool.LimitToWorldVelocity(aPMC.RB.velocity);
+            BugFreeTool.LimitToWorldVelocity(aPMC.RB.linearVelocity);
         }
     }
 }

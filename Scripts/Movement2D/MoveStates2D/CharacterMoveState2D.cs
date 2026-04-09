@@ -36,7 +36,7 @@ namespace BugFreeProductions.Tools2D
         // move the character
         protected virtual void MoveCharacter()
         {
-            BugFreeTool2D.LimitToWorldVelocity(context.RB2D.velocity);
+            BugFreeTool2D.LimitToWorldVelocity(context.RB2D.linearVelocity);
         }
 
         #region Change State Methods

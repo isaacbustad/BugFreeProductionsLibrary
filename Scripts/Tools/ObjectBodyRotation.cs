@@ -48,7 +48,7 @@ namespace BugFreeProductions.Tools
 
                 else
                 {
-                    aTF.Rotate(rotDir.normalized * bodyObjectRotation_SCO.RotMult * rb.velocity.magnitude * Time.deltaTime);
+                    aTF.Rotate(rotDir.normalized * bodyObjectRotation_SCO.RotMult * rb.linearVelocity.magnitude * Time.deltaTime);
                 }
             }
 
