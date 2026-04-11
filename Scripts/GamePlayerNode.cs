@@ -13,6 +13,7 @@ namespace BugFreeProductions.Tools
     // Input Bridge
     public class GamePlayerNode : MonoBehaviour
     {
+        
         // Vars
         [SerializeField] protected Camera nodeCamera = null;
 
@@ -31,7 +32,7 @@ namespace BugFreeProductions.Tools
         // store game mode node
         protected GameModeNode gameModeNode = null;
 
-        // Methods
+        #region Methods
         protected virtual void OnEnable()
         {
             CollectVars();
@@ -112,6 +113,8 @@ namespace BugFreeProductions.Tools
         }
 
         #endregion 
+
+        #endregion Methods
 
         // Accessors
         public bool IsPlayerCharacter {  set { isPlayerCharacter = value; ChangeIsPlayerCharacter(value); } }
