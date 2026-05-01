@@ -9,15 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e295f1dba2374e84e80760075b28224c, type: 3}
+  m_Script: {fileID: 11500000, guid: fada3564b493dec6db656352b067bd90, type: 3}
   m_Name: ColorPallet_SCO
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp-firstpass::BugFreeProductions.Tools.ColorPallet_SCO
   colorSwatches:
-  - {fileID: 11400000, guid: 172598c1172d5474c9fc571c75d71616, type: 2}
-  - {fileID: 11400000, guid: 80233353f7793fb48a17eeed091e22d8, type: 2}
-  - {fileID: 11400000, guid: 2ce64d5e4c6f50b4187fea5ef1864550, type: 2}
-  - {fileID: 11400000, guid: 78b4d99b5d8ad7140bfc201cb2b0f1cb, type: 2}
-  - {fileID: 11400000, guid: 41fcb603247f82245851c6c3ea76a6af, type: 2}
-  - {fileID: 11400000, guid: 268060d1315df604db5db925f6f07240, type: 2}
-  - {fileID: 11400000, guid: 27a7d3fac989c0b4097b41374af7bb22, type: 2}
-  - {fileID: 11400000, guid: fd86b4494a530c04b91b1093a8f82a84, type: 2}
+  - {fileID: 11400000, guid: 719d1d1e488203677ae19650112afe74, type: 2}

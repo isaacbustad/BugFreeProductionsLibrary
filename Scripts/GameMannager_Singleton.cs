@@ -91,6 +91,7 @@ namespace BugFreeProductions.Tools
         public void OnPlayerJoin(PlayerInput aPI)
         {
             piCollectors.Add(aPI.GetComponent<SinglePlayerInputCollector>());
+            Debug.LogError("looking for player input: " + this.name);
             InitPlayerRanks();
 
             // Refresh the game mode node info if exist
@@ -103,7 +104,7 @@ namespace BugFreeProductions.Tools
             // Refresh the game mode node info if exist
             if (gameModeNode == null)
             {
-                gameModeNode = FindObjectOfType<GameModeNode>();
+                gameModeNode = FindFirstObjectByType<GameModeNode>();
             }
             gameModeNode.RefreshGameModeInfo();
         }

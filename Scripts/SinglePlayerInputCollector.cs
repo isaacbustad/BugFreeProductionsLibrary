@@ -16,7 +16,7 @@ namespace BugFreeProductions.Tools
 
         // Vars
         //protected GameModeNode gameModeNode = null;
-        protected GamePlayerNode playerNode = null;
+        [SerializeField] protected GamePlayerNode playerNode = null;
 
 
         // Methods

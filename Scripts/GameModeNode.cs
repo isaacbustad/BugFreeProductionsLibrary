@@ -81,12 +81,12 @@ namespace BugFreeProductions.Tools
         public virtual void RefreshGameModeInfo()
         {
             
-
+            Debug.LogError("Refreshing info: " + this.name);
             // refresh Camera Viewport info
-            RefreshCameraViewportRefference();
+            RefreshCameraViewportReference();
 
             // refresh Inputs 
-            RefreshInputRefference();
+            RefreshInputReference();
 
             // initialized if not initialized
             InitGameMode();
@@ -101,7 +101,7 @@ namespace BugFreeProductions.Tools
         }
 
         // method to refresh input assignments
-        protected virtual void RefreshInputRefference()
+        protected virtual void RefreshInputReference()
         {
             GameMannager_Singleton gms = GameMannager_Singleton.Instance;
 
@@ -112,7 +112,7 @@ namespace BugFreeProductions.Tools
             List<SinglePlayerInputCollector> spics = gms.PICollectors;
 
 
-            // assign player node refference to input collectors
+            // assign player node reference to input collectors
             if (spics.Count > 0 && playerNodes.Count >= spics.Count)
             {
                 for (int i = 0; i < spics.Count; i++)
@@ -125,6 +125,7 @@ namespace BugFreeProductions.Tools
 
                     // look for player node camera
                     Camera camera = playerNodes[i].NodeCamera;
+
                     // add player cameras if there are any
                     if (camera != null)
                     {
@@ -132,6 +133,7 @@ namespace BugFreeProductions.Tools
                     }
 
                 }
+                Debug.LogError("Plater found: " + this.name);
             }
             else if(playerNodes.Count < spics.Count)
             {
@@ -140,7 +142,7 @@ namespace BugFreeProductions.Tools
             
         }
 
-        protected virtual void RefreshCameraViewportRefference()
+        protected virtual void RefreshCameraViewportReference()
         {
             cameraViewportManager = new CameraViewportManager();
 
