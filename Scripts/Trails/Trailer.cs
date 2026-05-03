@@ -15,12 +15,12 @@ namespace BugFreeProductions.Tools{
 
         [SerializeField] protected TrailMethod trailMethod;
         [SerializeField] protected LineRenderer lineRenderer;
+        
+
         [SerializeField] protected int maxNumberOfPoints = 100;
         [SerializeField] protected float pointDelay = 0.1f;
         [SerializeField] protected float timeToLastPoint = 0f;
-
-        // List of all the current trail points
-        [SerializeField] protected List<Vector3> trailPoints = new List<Vector3>();
+        protected List<Vector3> trailPoints = new List<Vector3>();
         #endregion Vars
 
         #region Methods
@@ -59,7 +59,7 @@ namespace BugFreeProductions.Tools{
 
             if (trailPoints.Count > maxNumberOfPoints)
             {
-                for (int i = 0; i<= trailPoints.Count - maxNumberOfPoints; i++)
+                for (int i = 0; i <= trailPoints.Count - maxNumberOfPoints; i++)
                 {
                     trailPoints.RemoveAt(0);
                 }
