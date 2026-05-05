@@ -17,14 +17,15 @@ namespace BugFreeProductions.Tools
 
 
         [SerializeField] protected TrailMethod trailMethod;
-        [SerializeField] protected LineRenderer lineRenderer;
+        [SerializeField] protected List<LineRenderer> lineRenderers;
         [SerializeField] protected int maxNumberOfPoints = 100;
         [SerializeField] protected float pointDelay = 0.1f;
         [SerializeField] protected float timeToLastPoint = 0f;
 
+        [SerializeField] protected float lineDrift = 0f;
+
         // List of all the current trail points
-        [SerializeField] protected List<Vector3> trailPoints1 = new List<Vector3>();
-        [SerializeField] protected List<Vector3> trailPoints2 = new List<Vector3>();
+        List<List<Vector3>> allPos = new List<List<Vector3>>();
 
         // tracked locations
         [SerializeField] protected List<Transform> Locs = new List<Transform>();
@@ -68,15 +69,20 @@ namespace BugFreeProductions.Tools
 
         protected virtual void AddPoint()
         {
-            trailPoints1.Add(transform.position);
+            // hold a list of all position list
+            allPos = new List<List<Vector3>>();
 
-            if (trailPoints1.Count > maxNumberOfPoints)
+            foreach (KeyValuePair<int, List<Vector3>> aKVP in trailsByLocation)
             {
-                for (int i = 0; i<= trailPoints1.Count - maxNumberOfPoints; i++)
-                {
-                    trailPoints1.RemoveAt(0);
-                }
+                // add a single position
+                aKVP.Value.Add(Locs[aKVP.Key].position);
+
+                // update all positions
+                allPos.Add(aKVP.Value) ;
+                
             }
+
+            
 
             // trailPoints2.Add()
             // if (trailPoints1.Count > maxNumberOfPoints)
@@ -92,7 +98,7 @@ namespace BugFreeProductions.Tools
 
         protected virtual void RenderTrail()
         {
-            //trailMethod.RenderTrail(trailPoints, lineRenderer);
+            trailMethod.RenderTrail(allPos, lineRenderers,lineDrift);
         }
 
 

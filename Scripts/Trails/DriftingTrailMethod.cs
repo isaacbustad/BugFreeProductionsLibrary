@@ -1,7 +1,13 @@
-using UnityEngine;
+// Created By   :   Isaac Bustad
+// Created      :   4/1/2026
 
-[CreateAssetMenu(fileName = "DriftingTrailMethod", menuName = "Scriptable Objects/DriftingTrailMethod")]
-public class DriftingTrailMethod : ScriptableObject
+
+using UnityEngine;
+namespace BugFreeProductions.Tools
 {
-    
+    [CreateAssetMenu(fileName = "DriftingTrailMethod", menuName = "ScriptableObject/DriftingTrailMethod")]
+    public class DriftingTrailMethod : TrailMethod
+    {
+        
+    }
 }

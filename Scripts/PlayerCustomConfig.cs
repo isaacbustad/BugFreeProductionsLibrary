@@ -1,16 +1,17 @@
+// Created By   :   Isaac Bustad   
+// Created      :   4/17/2026  
+
+
 using UnityEngine;
 
-public class PlayerCustomConfig : MonoBehaviour
-{
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+namespace BugFreeProductions.Tools{
+    public class PlayerCustomConfig
     {
+        #region Vars
         
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        #endregion Vars
+
+
     }
 }

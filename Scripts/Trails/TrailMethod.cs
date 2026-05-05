@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Unity.VisualScripting.Dependencies.Sqlite;
 
 namespace BugFreeProductions.Tools
 {
@@ -113,16 +114,16 @@ namespace BugFreeProductions.Tools
         public void RenderTrail(List<List<Vector3>> aAllPos, List<LineRenderer> aAllLRs)
         {
             // store new lists of positions
-            List<List<Vector3>> nAllPos = CalculateNewListOfPositions(aAllPos);
-
+            //List<List<Vector3>> nAllPos = CalculateNewListOfPositions(aAllPos);
+            Debug.Log("CallMe");
             // Draw the Lines nPos1.Add(aPos1[i] - (driftDir*i*aDrift/100));
-            for (int l = 0; l < nAllPos.Count; l++)
+            for (int l = 0; l < aAllPos.Count; l++)
             {
                 // create available line renderer indexes
-                aAllLRs[l].positionCount = nAllPos[l].Count();
+                aAllLRs[l].positionCount = aAllPos[l].Count();
 
                 // assign positions to line renderer indexes
-                aAllLRs[l].SetPositions(nAllPos[l].ToArray());
+                aAllLRs[l].SetPositions(aAllPos[l].ToArray());
 
             }
 
@@ -136,9 +137,37 @@ namespace BugFreeProductions.Tools
             List<List<Vector3>> nAllPos = CalculateNewListOfPositions(aAllPos);
 
             // find the midpoint
-            int length = nAllPos[0].Count;
+            int length = nAllPos.Count;
             int half = length / 2;
             int remainder = length % 2;
+
+            //int increment = 0;
+
+            List<List<Vector3>> finalList = new List<List<Vector3>>();
+
+            // foreach (List<Vector3> aPos in nAllPos)
+            // {
+            //     List<Vector3> nearFinalList = new List<Vector3>();
+            //     if (increment < half)
+            //     {
+            //         for (int i = 0; i < aPos.Count; i++)
+            //         {
+            //             if (i == 0)
+            //             {
+            //                 nearFinalList.Add(aPos[i]);
+            //             }
+            //             else
+            //             {
+            //                 nearFinalList.Add(aPos[i]);
+            //                    //nearFinalList.Add(aPos[i] - (driftDir * i * aDrift / length));
+            //             }
+            //         }
+            //     }
+
+            //     increment ++;
+            // }
+            Debug.Log("Pre loop");
+
 
 
             if (remainder == 0)
@@ -146,6 +175,7 @@ namespace BugFreeProductions.Tools
                 // Draw the Lines nPos1.Add(aPos1[i] - (driftDir*i*aDrift/100));
                 for (int l = 0; l < half; l++)
                 {
+                    Debug.Log("First index " + aAllPos[0].Count() );
                     // first pos list
                     List<Vector3> nFirstPosL = new List<Vector3>();
 
@@ -154,35 +184,45 @@ namespace BugFreeProductions.Tools
                     List<Vector3> nSecondPosL = new List<Vector3>();
 
 
-                    for(int i = 0; i < nAllPos[l].Count(); i++)
+            //         foreach (List<Vector3> )
+
+                    for(int i = 0; i < half; i++)
                     {
+
+                        Debug.Log("begin for loop" );
                         // if it is the first point first point do not drift
                         if (i == 0)
                         {
                             nFirstPosL.Add(nAllPos[l][i]);
 
                             nSecondPosL.Add(nAllPos[nAllPos[l].Count()-1-l][i]);
+                            Debug.Log("First index" );
                         }
 
                         else
                         {
-                            // drift direction
-                            // get general direction
-                            Vector3 aDriftMod = nAllPos[nAllPos[l].Count()-1-l][i] - nAllPos[l][i];
+                            nFirstPosL.Add(nAllPos[l][i]);
 
-                            // normalize
-                            aDriftMod.Normalize();
+                            nSecondPosL.Add(nAllPos[nAllPos[l].Count()-1-l][i]);
+                            // Debug.Log("Enter Else" );
+                            // // drift direction
+                            // // get general direction
+                            // Vector3 aDriftMod = nAllPos[nAllPos[l].Count()-1-l][i] - nAllPos[l][i];
 
-                            // find the percentage through the list
-                            float percentage = l / nAllPos[l].Count();
+                            // // normalize
+                            // aDriftMod.Normalize();
+                            // Debug.Log("Current Mod vector: " + aDriftMod);
 
-                            // multiply by the percentage through the list
-                            aDriftMod = aDriftMod * percentage * aDrift;
+                            // // find the percentage through the list
+                            // float percentage = l / nAllPos[l].Count();
+
+                            // // multiply by the percentage through the list
+                            // aDriftMod = aDriftMod * percentage * aDrift;
 
                             
-                            nFirstPosL.Add(nAllPos[l][i] + aDriftMod);
+                            // nFirstPosL.Add(nAllPos[l][i] + aDriftMod);
 
-                            nSecondPosL.Add(nAllPos[nAllPos[l].Count()-1-l][i] - aDriftMod);
+                            // nSecondPosL.Add(nAllPos[nAllPos[l].Count()-1-l][i] - aDriftMod);
                         }
                     }
 
@@ -203,13 +243,6 @@ namespace BugFreeProductions.Tools
                     // assign positions to line renderer indexes for opposite line
                     aAllLRs[nAllPos[l].Count()-1-l].SetPositions(nSecondPosL.ToArray());
 
-
-
-
-
-
-
-                    
 
                 } 
             }
@@ -242,6 +275,15 @@ namespace BugFreeProductions.Tools
 
         }
 
+
+        // To do make new lines that push away from the center
+        public void RenderTrail(List<List<Vector3>> aAllPos, List<LineRenderer> aAllLRs, float aDrift, List<Vector3> aCenterPos)
+        {
+            for(int l = 0; l < aAllPos.Count(); l++)
+            {
+                // nPos
+            }
+        }
         #endregion TrailRendering
 
 
@@ -251,15 +293,16 @@ namespace BugFreeProductions.Tools
         protected virtual int CalculateMinCount(List<List<Vector3>> aAllPos)
         {
             // store the minimum
-            int minCount = int.MaxValue;
+            int minCount = aAllPos[0].Count;
 
             // loop and find the minimum
             
-            for (int l =0; l < aAllPos.Count; l++)
+            foreach (List<Vector3> aPos in aAllPos)
             {
-                if (aAllPos[l].Count < minCount)
+                if (aPos.Count() < minCount)
                 {
-                    minCount = aAllPos[l].Count;
+                    minCount = aPos.Count();
+                    
                 }
             }
 
@@ -272,16 +315,17 @@ namespace BugFreeProductions.Tools
         {
             // store the minimum
             int minCount = CalculateMinCount(aAllPos);
+            Debug.Log("Minimum count = " + minCount );
 
             // store new lists of positions
             List<List<Vector3>> nAllPos = new List<List<Vector3>>();
 
             
             // loop and clamp the V3 list leangths
-            for (int l = 0; l < aAllPos.Count; l++)
+            foreach (List<Vector3> aPos in aAllPos)
             {
                 // construct new clamped list
-                List<Vector3> nPos = aAllPos[l].GetRange(0, minCount);
+                List<Vector3> nPos = aPos.GetRange(0, minCount);
 
                 // add clamped list to new all list
                 nAllPos.Add(nPos);
