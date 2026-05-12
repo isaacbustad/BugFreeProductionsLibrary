@@ -5,7 +5,7 @@
 
 using UnityEngine;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using System.Linq;
 
 namespace BugFreeProductions.Tools
 {
@@ -28,18 +28,25 @@ namespace BugFreeProductions.Tools
         List<List<Vector3>> allPos = new List<List<Vector3>>();
 
         // tracked locations
-        [SerializeField] protected List<Transform> Locs = new List<Transform>();
+        [SerializeField] protected List<Transform> locs = new List<Transform>();
+        
+
+        // location for center line
+        [SerializeField] protected Transform centerLoc = null;
 
         // lists by location
         protected Dictionary<int, List<Vector3>> trailsByLocation = new Dictionary<int, List<Vector3>>();
+        protected List<Vector3> centerLocs = new List<Vector3>();
+
+
         #endregion Vars
 
         #region Methods
         protected virtual void OnEnable()
         {
-            for (int i = 0; i < trailsByLocation.Count; i++)
+            for (int i = 0; i < locs.Count; i++)
             {
-                trailsByLocation[i].Add(Locs[i].position);
+                trailsByLocation.Add(i,new List<Vector3>(){locs[i].position});
                 
             }
 
@@ -49,10 +56,14 @@ namespace BugFreeProductions.Tools
         protected virtual void Update()
         {
             DelayPoint(Time.deltaTime);
-            if (trailMethod != null)
+            if (allPos != allPos.DefaultIfEmpty())
             {
-                RenderTrail();
+                if (trailMethod != null && allPos[0].Count == maxNumberOfPoints)
+                {
+                    RenderTrail();
+                }    
             }
+            
         }
 
         protected virtual void DelayPoint(float atime)
@@ -70,17 +81,36 @@ namespace BugFreeProductions.Tools
         protected virtual void AddPoint()
         {
             // hold a list of all position list
-            allPos = new List<List<Vector3>>();
-
-            foreach (KeyValuePair<int, List<Vector3>> aKVP in trailsByLocation)
+            List<Vector3> nlocs = new List<Vector3>();
+            foreach (Transform tf in locs)
             {
-                // add a single position
-                aKVP.Value.Add(Locs[aKVP.Key].position);
-
-                // update all positions
-                allPos.Add(aKVP.Value) ;
-                
+                nlocs.Add(tf.position);
             }
+
+            trailMethod.AddVectorToList(trailsByLocation, allPos, nlocs, centerLocs, centerLoc.position, maxNumberOfPoints);
+            // allPos = new List<List<Vector3>>();
+
+            // foreach (KeyValuePair<int, List<Vector3>> aKVP in trailsByLocation)
+            // {
+            //     // add a single position
+            //     aKVP.Value.Add(Locs[aKVP.Key].position);
+
+            //     while(aKVP.Value.Count > maxNumberOfPoints)
+            //     {
+            //         aKVP.Value.RemoveAt(0);
+            //     }
+
+            //     // update all positions
+            //     allPos.Add(aKVP.Value);
+                
+            // }
+
+            // centerLocs.Add(centerLoc.position);
+
+            // while (centerLocs.Count > maxNumberOfPoints)
+            // {
+            //     centerLocs.RemoveAt(0);
+            // }
 
             
 
@@ -98,7 +128,7 @@ namespace BugFreeProductions.Tools
 
         protected virtual void RenderTrail()
         {
-            trailMethod.RenderTrail(allPos, lineRenderers,lineDrift);
+            trailMethod.RenderTrail(allPos, lineRenderers,lineDrift,centerLocs);
         }
 
 

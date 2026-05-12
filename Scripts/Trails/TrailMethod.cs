@@ -120,7 +120,7 @@ namespace BugFreeProductions.Tools
             for (int l = 0; l < aAllPos.Count; l++)
             {
                 // create available line renderer indexes
-                aAllLRs[l].positionCount = aAllPos[l].Count();
+                aAllLRs[l].positionCount = aAllPos[l].Count;
 
                 // assign positions to line renderer indexes
                 aAllLRs[l].SetPositions(aAllPos[l].ToArray());
@@ -279,10 +279,102 @@ namespace BugFreeProductions.Tools
         // To do make new lines that push away from the center
         public void RenderTrail(List<List<Vector3>> aAllPos, List<LineRenderer> aAllLRs, float aDrift, List<Vector3> aCenterPos)
         {
-            for(int l = 0; l < aAllPos.Count(); l++)
+
+            int minCount = CalculateMinCount(aAllPos);
+
+
+            //Debug.Log("Called");
+            // hold new all poses list
+            List<List<Vector3>> nAllPos = new List<List<Vector3>>();
+            //Debug.Log("new list made");
+
+            //Debug.Log("Called" + aAllPos.Count());
+
+            for(int l = 0; l < aAllPos.Count; l++)
             {
-                // nPos
+                //Debug.Log("Enter 4 loop = " + l);
+                // hold the new pos list
+                List<Vector3> nPos = new List<Vector3>();
+
+                // 
+                for (int i = 0; i < aAllPos[l].Count; i++)
+                {
+                    // calc drift direction
+                    Vector3 driftDir = aAllPos[l][i] - aCenterPos[i];
+                    driftDir.Normalize();
+
+                    // if first index
+                    if (i == 0)
+                    {
+                        driftDir *= aDrift;
+                        Vector3 pos = aAllPos[l][i];
+                        pos += driftDir;
+                        
+                        // add the new position to the list
+                        
+                        nPos.Add(pos);
+                    }
+
+                    else
+                    {
+                        driftDir *= aDrift / i;
+                        //Debug.Log("leangth " + aDrift / i);
+
+                        // calculate the new position
+                        Vector3 pos = aAllPos[l][i] + driftDir;
+
+                        // add the new position to the list
+                        
+                        nPos.Add(pos);
+                    }
+
+                    
+                }
+                Debug.Log("tst adding to all nPos");
+                nPos = nPos.GetRange(1,minCount-1);
+                
+                
+                
+                // add the new pos list to the list
+                nAllPos.Add(nPos);
+
             }
+
+            for (int l = 0; l < nAllPos.Count; l++)
+            {
+                //Debug.Log("Render");
+                RenderTrail(nAllPos[l],aAllLRs[l]);
+            }
+        }
+
+        public void AddVectorToList(Dictionary<int, List<Vector3>> aTrailsByLocation, List<List<Vector3>> aAllPos, List<Vector3> aLocs, List<Vector3> aCenterLocs, Vector3 aCenterLoc, int aMaxNumberOfPoints)
+        {
+             // hold a list of all position list
+            aAllPos = new List<List<Vector3>>();
+
+            foreach (KeyValuePair<int, List<Vector3>> aKVP in aTrailsByLocation)
+            {
+                // add a single position
+                aKVP.Value.Add(aLocs[aKVP.Key]);
+
+                while(aKVP.Value.Count > aMaxNumberOfPoints)
+                {
+                    aKVP.Value.RemoveAt(0);
+                }
+
+                // update all positions
+                aAllPos.Add(aKVP.Value);
+                Debug.Log("All Pos: " + aAllPos.Count);
+                
+            }
+
+            aCenterLocs.Add(aCenterLoc);
+
+            while (aCenterLocs.Count > aMaxNumberOfPoints)
+            {
+                aCenterLocs.RemoveAt(0);
+            }
+
         }
         #endregion TrailRendering
 
@@ -299,9 +391,9 @@ namespace BugFreeProductions.Tools
             
             foreach (List<Vector3> aPos in aAllPos)
             {
-                if (aPos.Count() < minCount)
+                if (aPos.Count < minCount)
                 {
-                    minCount = aPos.Count();
+                    minCount = aPos.Count;
                     
                 }
             }

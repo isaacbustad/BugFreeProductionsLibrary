@@ -117,13 +117,13 @@ namespace BugFreeProductions.Tools
         #endregion Methods
 
         // Accessors
-        public bool IsPlayerCharacter {  set { isPlayerCharacter = value; ChangeIsPlayerCharacter(value); } }
-        public Camera NodeCamera { get { return nodeCamera; } }
-        public Vector3 MovDir { get { return moveDir; } }
+        public virtual bool IsPlayerCharacter {  set { isPlayerCharacter = value; ChangeIsPlayerCharacter(value); } }
+        public virtual Camera NodeCamera { get { return nodeCamera; } }
+        public virtual Vector3 MovDir { get { return moveDir; } }
 
-        public SinglePlayerInputCollector SinglePlayerInputCollector { get { return singlePlayerInputCollector; } set { singlePlayerInputCollector = value; } }
+        public virtual SinglePlayerInputCollector SinglePlayerInputCollector { get { return singlePlayerInputCollector; } set { singlePlayerInputCollector = value; } }
         
-        public GameModeNode GameModeNode 
+        public virtual GameModeNode GameModeNode 
         { 
             get 
             { 

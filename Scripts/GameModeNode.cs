@@ -81,7 +81,7 @@ namespace BugFreeProductions.Tools
         public virtual void RefreshGameModeInfo()
         {
             
-            Debug.LogError("Refreshing info: " + this.name);
+            //Debug.LogError("Refreshing info: " + this.name);
             // refresh Camera Viewport info
             RefreshCameraViewportReference();
 

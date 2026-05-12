@@ -108,7 +108,7 @@ namespace BugFreeProductions.Tools
         #region Destroy Logic
         #endregion
         // Accessors
-        public GamePlayerNode PlayerNode { get { return playerNode; } set { playerNode = value; playerNode.IsPlayerCharacter = true; } }
+        public virtual GamePlayerNode PlayerNode { get { return playerNode; } set { playerNode = value; playerNode.IsPlayerCharacter = true; } }
 
 
     }
