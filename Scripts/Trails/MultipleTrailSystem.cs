@@ -23,6 +23,7 @@ namespace BugFreeProductions.Tools
         [SerializeField] protected float timeToLastPoint = 0f;
 
         [SerializeField] protected float lineDrift = 0f;
+        [SerializeField] protected float trailOffset = 0f;
 
         // List of all the current trail points
         List<List<Vector3>> allPos = new List<List<Vector3>>();
@@ -50,19 +51,22 @@ namespace BugFreeProductions.Tools
                 
             }
 
+            
+
 
         }
         
         protected virtual void Update()
         {
             DelayPoint(Time.deltaTime);
-            if (allPos != allPos.DefaultIfEmpty())
+            if (allPos.Count > 0)
             {
-                if (trailMethod != null && allPos[0].Count == maxNumberOfPoints)
+                if (trailMethod != null)
                 {
                     RenderTrail();
                 }    
             }
+            
             
         }
 
@@ -81,54 +85,39 @@ namespace BugFreeProductions.Tools
         protected virtual void AddPoint()
         {
             // hold a list of all position list
-            List<Vector3> nlocs = new List<Vector3>();
-            foreach (Transform tf in locs)
+            allPos = new List<List<Vector3>>();
+
+            foreach (KeyValuePair<int, List<Vector3>> aKVP in trailsByLocation)
             {
-                nlocs.Add(tf.position);
+                // add a single position
+                aKVP.Value.Add(locs[aKVP.Key].position);
+
+                while(aKVP.Value.Count > maxNumberOfPoints)
+                {
+                    aKVP.Value.RemoveAt(0);
+                }
+
+                // update all positions
+                allPos.Add(aKVP.Value);
+                Debug.Log("All Pos: " + allPos.Count);
+                
             }
 
-            trailMethod.AddVectorToList(trailsByLocation, allPos, nlocs, centerLocs, centerLoc.position, maxNumberOfPoints);
-            // allPos = new List<List<Vector3>>();
+            centerLocs.Add(centerLoc.position);
 
-            // foreach (KeyValuePair<int, List<Vector3>> aKVP in trailsByLocation)
-            // {
-            //     // add a single position
-            //     aKVP.Value.Add(Locs[aKVP.Key].position);
-
-            //     while(aKVP.Value.Count > maxNumberOfPoints)
-            //     {
-            //         aKVP.Value.RemoveAt(0);
-            //     }
-
-            //     // update all positions
-            //     allPos.Add(aKVP.Value);
-                
-            // }
-
-            // centerLocs.Add(centerLoc.position);
-
-            // while (centerLocs.Count > maxNumberOfPoints)
-            // {
-            //     centerLocs.RemoveAt(0);
-            // }
-
-            
-
-            // trailPoints2.Add()
-            // if (trailPoints1.Count > maxNumberOfPoints)
-            // {
-            //     for (int i = 0; i<= trailPoints1.Count - maxNumberOfPoints; i++)
-            //     {
-            //         trailPoints1.RemoveAt(0);
-            //     }
-            // }
-
+            while (centerLocs.Count > maxNumberOfPoints)
+            {
+                centerLocs.RemoveAt(0);
+            }
             
         }
 
+
+
+
         protected virtual void RenderTrail()
         {
-            trailMethod.RenderTrail(allPos, lineRenderers,lineDrift,centerLocs);
+            trailMethod.RenderTrail(allPos, lineRenderers,centerLocs,lineDrift,trailOffset);
         }
 
 
