@@ -8,10 +8,10 @@ using UnityEngine;
 
 namespace BugFreeProductions.Tools
 {
-    public interface Subscription
+    public interface ISubscription
     {
         // Vars
         // deligate that calls the notify method on subscribers
-        public delegate void notifySubscriber();
+        public delegate void notifySubscriber(SubMessage aMessage);
     }
 }

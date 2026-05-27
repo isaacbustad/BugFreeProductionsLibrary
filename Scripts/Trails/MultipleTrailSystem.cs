@@ -6,6 +6,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 
 namespace BugFreeProductions.Tools
 {
@@ -30,7 +31,7 @@ namespace BugFreeProductions.Tools
 
         // tracked locations
         [SerializeField] protected List<Transform> locs = new List<Transform>();
-        
+
 
         // location for center line
         [SerializeField] protected Transform centerLoc = null;
@@ -118,6 +119,7 @@ namespace BugFreeProductions.Tools
 
         protected virtual void RenderTrail()
         {
+            //List<List(Vector3)>
             trailMethod.RenderTrail(allPos, lineRenderers,centerLocs,lineDrift,trailOffset);
         }
 

@@ -7,12 +7,12 @@ using UnityEngine;
 
 namespace BugFreeProductions.Tools
 {
-    public interface Subscriber
+    public interface ISubscriber
     {
         // Methods
         // runs when Subscription notifies subscribers
         // add this to subscriber delegate
-        protected void OnNotify();
+        public void OnNotify(SubMessage aSubMessage);
 
         // adds Subscriber to subscription
         protected void AddSubscription();

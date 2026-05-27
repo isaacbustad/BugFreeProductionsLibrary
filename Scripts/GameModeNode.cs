@@ -12,7 +12,7 @@ using UnityEngine;
 namespace BugFreeProductions.Tools
 
 {
-    public class GameModeNode : MonoBehaviour
+    public class GameModeNode : MonoBehaviour, ISubscription
     {
         // Vars
         // game player nodes
@@ -36,7 +36,7 @@ namespace BugFreeProductions.Tools
                 gms.GameModeNode = this;
                 gms.RefreshGameModeNode();
             }
-                        
+
         }
 
         // Set Defaults
@@ -63,8 +63,8 @@ namespace BugFreeProductions.Tools
         // to be overwritten by child classes
         protected virtual void RankPlayers()
         {
-            
-            
+
+
         }
 
         // update player rank in mannager
@@ -77,10 +77,10 @@ namespace BugFreeProductions.Tools
 
         #region Player and Camera management
 
-        
+
         public virtual void RefreshGameModeInfo()
         {
-            
+
             //Debug.LogError("Refreshing info: " + this.name);
             // refresh Camera Viewport info
             RefreshCameraViewportReference();
@@ -97,7 +97,7 @@ namespace BugFreeProductions.Tools
         // initialize the game mode
         protected virtual void InitGameMode()
         {
-                gameModeInit = true;            
+                gameModeInit = true;
         }
 
         // method to refresh input assignments
@@ -139,7 +139,7 @@ namespace BugFreeProductions.Tools
             {
                 Debug.LogError("Not enough Player Nodes are not added to Player Nodes Array on: " + this.name);
             }
-            
+
         }
 
         protected virtual void RefreshCameraViewportReference()
