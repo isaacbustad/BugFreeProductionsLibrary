@@ -48,14 +48,14 @@ namespace BugFreeProductions.Tools
             for (int i = 0; i < locs.Count; i++)
             {
                 trailsByLocation.Add(i,new List<Vector3>(){locs[i].position});
-                
+
             }
 
-            
 
 
         }
-        
+
+
         protected virtual void Update()
         {
             DelayPoint(Time.deltaTime);
@@ -64,15 +64,15 @@ namespace BugFreeProductions.Tools
                 if (trailMethod != null)
                 {
                     RenderTrail();
-                }    
+                }
             }
-            
-            
+
+
         }
 
         protected virtual void DelayPoint(float atime)
         {
-            timeToLastPoint += pointDelay;
+            timeToLastPoint += atime;
 
             if (timeToLastPoint > pointDelay)
             {
@@ -81,6 +81,7 @@ namespace BugFreeProductions.Tools
                 timeToLastPoint = 0;
             }
         }
+
 
         protected virtual void AddPoint()
         {
@@ -100,7 +101,7 @@ namespace BugFreeProductions.Tools
                 // update all positions
                 allPos.Add(aKVP.Value);
                 Debug.Log("All Pos: " + allPos.Count);
-                
+
             }
 
             centerLocs.Add(centerLoc.position);
@@ -109,7 +110,7 @@ namespace BugFreeProductions.Tools
             {
                 centerLocs.RemoveAt(0);
             }
-            
+
         }
 
 
