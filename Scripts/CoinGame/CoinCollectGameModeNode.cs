@@ -198,7 +198,7 @@ namespace BugFreeProductions.Party
         // activate canvas to end game
         protected virtual void ActivateCanvas()
         {
-            GameObject endGameCanvas = FindObjectOfType<MenuNavigation>().gameObject;
+            GameObject endGameCanvas = FindFirstObjectByType<MenuNavigation>().gameObject;
             endGameCanvas.SetActive(true);
         }
 

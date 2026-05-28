@@ -27,9 +27,13 @@ namespace BugFreeProductions.Tools
         // has the game mode been initalized
         protected bool gameModeInit = false;
 
+        // hold instance staticly for easy refference
+        protected GameModeNode instance = null;
+
         // Methods
         protected virtual void OnEnable()
         {
+
             GameMannager_Singleton gms = GameMannager_Singleton.Instance;
             if (gms != null)
             {
@@ -156,7 +160,31 @@ namespace BugFreeProductions.Tools
 
 
 
-        // Accessors
+        #region Accessors
+        public GameModeNode Instance
+        {
+            get
+            {
+                // if there is a different object set to the instance
+                if (instance != null && instance != this)
+                {
+                    // destroy this extra class ensuring singleton
+                    Destroy(this);
+                }
+
+                // if there is no instance assign this object
+                else if (instance == null)
+                {
+                    // assign this object
+                    instance = this;
+                }
+
+                // return the instance
+                return instance;
+            }
+        }
+
+        #endregion Accessors
 
 
 
