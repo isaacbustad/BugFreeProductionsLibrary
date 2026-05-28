@@ -38,7 +38,7 @@ namespace BugFreeProductions.Tools
         {
             //pib
             //GameMannager_Singleton.Instance.onGameNodeChangeDel += OnGameModeNodeChange;
-            transform.parent = GameMannager_Singleton.Instance.transform;
+            transform.parent = GameManager_Singleton.Instance.transform;
         }
 
         #region Input Management

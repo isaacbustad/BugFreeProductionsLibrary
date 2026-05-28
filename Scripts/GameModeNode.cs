@@ -6,6 +6,7 @@ using BugFreeProductions.Tools;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -24,21 +25,23 @@ namespace BugFreeProductions.Tools
         // store SinglePlayerInputCollector node ranking
         protected Dictionary<SinglePlayerInputCollector,int> playerRanks = new Dictionary<SinglePlayerInputCollector, int>();
 
-        // has the game mode been initalized
+        // has the game mode been initialized
         protected bool gameModeInit = false;
 
-        // hold instance staticly for easy refference
-        protected GameModeNode instance = null;
+        // hold instance statically for easy reference
+        protected static GameModeNode instance = null;
 
         // Methods
         protected virtual void OnEnable()
         {
+            // Make this object a singleton
+            MakeSingleton();
 
-            GameMannager_Singleton gms = GameMannager_Singleton.Instance;
-            if (gms != null)
+            //GameManager_Singleton gms = GameManager_Singleton.Instance;
+            if (GameManager_Singleton.Instance != null)
             {
-                gms.GameModeNode = this;
-                gms.RefreshGameModeNode();
+                //gms.GameModeNode = this;
+                GameManager_Singleton.Instance.RefreshGameModeNode();
             }
 
         }
@@ -54,7 +57,7 @@ namespace BugFreeProductions.Tools
         // based on Single Player Input
         protected virtual void ReadInitRank()
         {
-            playerRanks = GameMannager_Singleton.Instance.PlayerRanks;
+            playerRanks = GameManager_Singleton.Instance.PlayerRanks;
         }
 
         // update local player ranks on node
@@ -73,9 +76,9 @@ namespace BugFreeProductions.Tools
 
         // update player rank in mannager
         // assumes upatting of all players in game 
-        protected virtual void UpdateMannagerRanks()
+        protected virtual void UpdateManagerRanks()
         {
-            GameMannager_Singleton.Instance.UpdatePlayerRanks(playerRanks);
+            GameManager_Singleton.Instance.UpdatePlayerRanks(playerRanks);
         }
         #endregion
 
@@ -107,10 +110,10 @@ namespace BugFreeProductions.Tools
         // method to refresh input assignments
         protected virtual void RefreshInputReference()
         {
-            GameMannager_Singleton gms = GameMannager_Singleton.Instance;
+            GameManager_Singleton gms = GameManager_Singleton.Instance;
 
             // set all gameManagerSingalton game node to this node
-            gms.GameModeNode = this;
+            //gms.GameModeNode = this;
 
             // get input collectors from
             List<SinglePlayerInputCollector> spics = gms.PICollectors;
@@ -158,27 +161,28 @@ namespace BugFreeProductions.Tools
         }
         #endregion
 
+        protected void MakeSingleton()
+        {
+            // if there is no instance assign this object
+            if (instance == null)
+            {
+                // assign this object
+                instance = this;
+            }
+
+            else
+            {
+                Destroy(this);
+            }
+        }
+
 
 
         #region Accessors
-        public GameModeNode Instance
+        public static GameModeNode Instance
         {
             get
             {
-                // if there is a different object set to the instance
-                if (instance != null && instance != this)
-                {
-                    // destroy this extra class ensuring singleton
-                    Destroy(this);
-                }
-
-                // if there is no instance assign this object
-                else if (instance == null)
-                {
-                    // assign this object
-                    instance = this;
-                }
-
                 // return the instance
                 return instance;
             }

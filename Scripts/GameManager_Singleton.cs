@@ -11,19 +11,19 @@ using System.Linq;
 namespace BugFreeProductions.Tools
 
 {
-    public class GameMannager_Singleton : MonoBehaviour
+    public class GameManager_Singleton : MonoBehaviour
     {
         // Vars
         // Delegates
         /*public delegate void OnGameNodeChangeDel(GameModeNode aGMN);
         public OnGameNodeChangeDel onGameNodeChangeDel;*/
-        protected GameModeNode gameModeNode = null;
+        //protected GameModeNode gameModeNode = null;
 
 
         // instance of the singal object to refference
-        private static GameMannager_Singleton instance = null;
+        private static GameManager_Singleton instance = null;
 
-        private List<SinglePlayerInputCollector> piCollectors = new List<SinglePlayerInputCollector>();
+        protected List<SinglePlayerInputCollector> piCollectors = new List<SinglePlayerInputCollector>();
 
         // store current Player Ranks
         protected Dictionary<SinglePlayerInputCollector, int> playerRanks =
@@ -101,17 +101,13 @@ namespace BugFreeProductions.Tools
         // refresh the game mode node
         public virtual void RefreshGameModeNode()
         {
-            // Refresh the game mode node info if exist
-            if (gameModeNode == null)
-            {
-                gameModeNode = FindFirstObjectByType<GameModeNode>();
-            }
-            gameModeNode.RefreshGameModeInfo();
+            // Refresh the game mode node info if exist            
+            GameModeNode.Instance.RefreshGameModeInfo();
         }
 
 
         // Accessors
-        public static GameMannager_Singleton Instance
+        public static GameManager_Singleton Instance
         {
             get
             {
@@ -132,7 +128,7 @@ namespace BugFreeProductions.Tools
 
         // Accessors
         public List<SinglePlayerInputCollector> PICollectors { get { return piCollectors; } }
-        public GameModeNode GameModeNode { get { return gameModeNode; } set { gameModeNode = value; } }
+        //public GameModeNode GameModeNode { get { return gameModeNode; } set { gameModeNode = value; } }
 
         public Dictionary<SinglePlayerInputCollector,int> PlayerRanks { get { return playerRanks; } }
 

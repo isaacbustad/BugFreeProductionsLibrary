@@ -46,7 +46,7 @@ namespace BugFreeProductions.Party
             coinsCollByPlayer.Clear();
 
             // add all players to coinsCollByPlayer
-            foreach (SinglePlayerInputCollector spic in GameMannager_Singleton.Instance.PICollectors)
+            foreach (SinglePlayerInputCollector spic in GameManager_Singleton.Instance.PICollectors)
             {
                 coinsCollByPlayer.Add(spic, 0);
             }
@@ -139,7 +139,7 @@ namespace BugFreeProductions.Party
             playerRanks = sortedRanks;
 
             // comunicate the resulting rank to persistant manager
-            UpdateMannagerRanks();
+            UpdateManagerRanks();
 
             // activate
             ActivateCanvas();
