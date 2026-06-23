@@ -2,10 +2,10 @@
 // 5/13/2025
 
 
-using BugFreeProductions.Tools;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using BugFreeProductions.Tools;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -31,7 +31,7 @@ namespace BugFreeProductions.Tools
         // hold instance statically for easy reference
         protected static GameModeNode instance = null;
 
-        // Methods
+        #region Methods
         protected virtual void OnEnable()
         {
             // Make this object a singleton
@@ -176,7 +176,16 @@ namespace BugFreeProductions.Tools
             }
         }
 
+        #region ISubscription
+        public void Subscribe(ISubscriber subscriber) { Debug.Log("impliment Subscribe Method"); }
 
+        public void NotifySubscribers()
+        {
+            
+        }
+        #endregion ISubscription
+
+        #endregion Methods
 
         #region Accessors
         public static GameModeNode Instance

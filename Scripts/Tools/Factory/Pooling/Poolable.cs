@@ -23,11 +23,11 @@ namespace BugFreeProductions.Tools
             }
         }
 
-        
+
 
         // Accessors
         public virtual GenericPool Pool { get { return pool; } set { pool = value; } }
-        
+
 
 
     }

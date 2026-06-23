@@ -1,10 +1,11 @@
 // Created by   :   Isaac Bustad   
 // Created      :   4/26/2026
 
-using UnityEngine;
+
 using System.Collections.Generic;
-using System.Linq;
-using System;
+
+using UnityEngine;
+//using Vector3 = UnityEngine.Vector3;
 
 namespace BugFreeProductions.Tools
 {
@@ -20,7 +21,7 @@ namespace BugFreeProductions.Tools
         [SerializeField] protected float pointDelay = 0.1f;
         [SerializeField] protected float timeToLastPoint = 0f;
 
-        
+
 
         #endregion Vars
 
@@ -28,7 +29,7 @@ namespace BugFreeProductions.Tools
 
         #region TrailRendering
         public void RenderTrail(List<Vector3> positions, LineRenderer lineRenderer)
-        {    
+        {
             lineRenderer.positionCount = positions.Count;
             lineRenderer.SetPositions(positions.ToArray());
         }
@@ -37,12 +38,12 @@ namespace BugFreeProductions.Tools
 
         // Calculates for multiple trails
         public void RenderTrail(List<Vector3> aPos1, LineRenderer aLR1, List<Vector3> aPos2, LineRenderer aLR2)
-        {    
+        {
             aLR1.positionCount = aPos1.Count;
             aLR1.SetPositions(aPos1.ToArray());
 
             aLR2.positionCount = aPos2.Count;
-            aLR2.SetPositions(aPos2.ToArray());            
+            aLR2.SetPositions(aPos2.ToArray());
         }
 
 
@@ -96,21 +97,21 @@ namespace BugFreeProductions.Tools
                     driftDir.Normalize();
 
                     driftDir *= aDrift / (i+1);
-                    
+
                     // calculate the new position
                     Vector3 pos = aAllPos[l][i] + driftDir;
 
                     // add the new position to the list
-                    
+
                     nPos.Add(pos);
 
-                    
+
                 }
                 //Debug.Log("tst adding to all nPos");
                 nPos = nPos.GetRange(0,minCount-1);
-                
-                
-                
+
+
+
                 // add the new pos list to the list
                 nAllPos.Add(nPos);
 
@@ -151,21 +152,21 @@ namespace BugFreeProductions.Tools
                     driftDir.Normalize();
 
                     driftDir *= (aDrift / (i+1))+aOffset;
-                    
+
                     // calculate the new position
                     Vector3 pos = aAllPos[l][i] + driftDir;
 
                     // add the new position to the list
-                    
+
                     nPos.Add(pos);
 
-                    
+
                 }
                 //Debug.Log("tst adding to all nPos");
                 nPos = nPos.GetRange(0,minCount-1);
-                
-                
-                
+
+
+
                 // add the new pos list to the list
                 nAllPos.Add(nPos);
 
@@ -206,21 +207,21 @@ namespace BugFreeProductions.Tools
                     driftDir.Normalize();
 
                     driftDir *= (aDrift / (i+1))+aOffset;
-                    
+
                     // calculate the new position
                     Vector3 pos = aAllPos[l][i] + driftDir;
 
                     // add the new position to the list
-                    
+
                     nPos.Add(pos);
 
-                    
+
                 }
                 //Debug.Log("tst adding to all nPos");
                 nPos = nPos.GetRange(0,minCount-1);
-                
-                
-                
+
+
+
                 // add the new pos list to the list
                 nAllPos.Add(nPos);
 
@@ -232,9 +233,77 @@ namespace BugFreeProductions.Tools
                 RenderTrail(nAllPos[l],aAllLRs[l]);
             }
         }
-        
+
         #endregion TrailRendering
 
+        public void RenderTrail(int aTrailCount, List<LineRenderer> aAllLRs, List<OrientationData> aOrientations, List<OrientationDirection> aDirections, float aDrift, float aOffset)
+        {
+            //Dictionary<OrientationDirection, List<Vector3>> trailsByData = new Dictionary<OrientationDirection, List<Vector3>>();
+            List<List<Vector3>> allTrailList = new List<List<Vector3>>();
+            foreach (OrientationDirection dir in aDirections)
+            {
+                List<Vector3> posLst = new List<Vector3>();
+
+                for (int i = 0; i < aOrientations.Count; i++)
+                {
+                    // calc drift direction
+                    Vector3 driftDir = aOrientations[i].Direction(dir);
+                    driftDir.Normalize();
+
+                    driftDir *= (aDrift / (i+1)) + aOffset;
+
+                    // calculate the new position
+                    Vector3 pos = aOrientations[i].positionData + driftDir;
+
+                    // add the new position to the list
+
+                    posLst.Add(pos);
+
+
+                }
+
+                //trailsByData.Add(dir, posLst);
+                allTrailList.Add(posLst);
+            }
+            RenderTrail(allTrailList, aAllLRs);
+            Debug.Log("New Render Ran");
+            
+        }
+
+        public void RenderTrail(int aTrailCount, List<LineRenderer> aAllLRs, List<OrientationData> aOrientations, List<OrientationDirection> aDirections, float aDrift, float aTrailOffset, Vector3 aOffset)
+        {
+            //Dictionary<OrientationDirection, List<Vector3>> trailsByData = new Dictionary<OrientationDirection, List<Vector3>>();
+            List<List<Vector3>> allTrailList = new List<List<Vector3>>();
+            foreach (OrientationDirection dir in aDirections)
+            {
+                List<Vector3> posLst = new List<Vector3>();
+
+                for (int i = 0; i < aOrientations.Count; i++)
+                {
+                    // calc drift direction
+                    Vector3 driftDir = aOrientations[i].Direction(dir);
+                    driftDir.Normalize();
+
+                    driftDir *= (aDrift / (i+1)) + aTrailOffset ;
+                    driftDir += aOrientations[i].rotationData * aOffset;
+
+                    // calculate the new position
+                    Vector3 pos = aOrientations[i].positionData + driftDir;
+
+                    // add the new position to the list
+
+                    posLst.Add(pos);
+
+
+                }
+
+                //trailsByData.Add(dir, posLst);
+                allTrailList.Add(posLst);
+            }
+            RenderTrail(allTrailList, aAllLRs);
+            Debug.Log("New Render Ran");
+            
+        }
 
 
 
@@ -245,13 +314,13 @@ namespace BugFreeProductions.Tools
             int minCount = aAllPos[0].Count;
 
             // loop and find the minimum
-            
+
             foreach (List<Vector3> aPos in aAllPos)
             {
                 if (aPos.Count < minCount)
                 {
                     minCount = aPos.Count;
-                    
+
                 }
             }
 
@@ -269,7 +338,7 @@ namespace BugFreeProductions.Tools
             // store new lists of positions
             List<List<Vector3>> nAllPos = new List<List<Vector3>>();
 
-            
+
             // loop and clamp the V3 list leangths
             foreach (List<Vector3> aPos in aAllPos)
             {
@@ -280,7 +349,7 @@ namespace BugFreeProductions.Tools
                 nAllPos.Add(nPos);
             }
 
-            
+
             // return new list of positions
             return nAllPos;
         }
@@ -297,7 +366,7 @@ namespace BugFreeProductions.Tools
 
 
         #region Accessors
-        
+
         #endregion Accessors
     }
 }

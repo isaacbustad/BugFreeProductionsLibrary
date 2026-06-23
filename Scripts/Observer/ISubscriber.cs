@@ -15,10 +15,10 @@ namespace BugFreeProductions.Tools
         public void OnNotify(SubMessage aSubMessage);
 
         // adds Subscriber to subscription
-        protected void AddSubscription();
+        public void AddSubscription();
 
         // removes Subscriber to subscription
-        protected void RemoveSubscription();
+        public void RemoveSubscription();
 
 
     }

@@ -3,18 +3,18 @@
 
 
 
-using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
+//using NUnit.Framework;
+using UnityEngine;
 
 namespace BugFreeProductions.Tools
 {
 
-    public class MultipleTrailSystem : MonoBehaviour
+    public class MultipleTrailSystem : FactoryItem//, ISubscriber
     {
         #region Vars
-        [SerializeField] protected bool isLineTrail;
+        [SerializeField] protected TrailType trailType;
 
 
         [SerializeField] protected TrailMethod trailMethod;
@@ -33,6 +33,8 @@ namespace BugFreeProductions.Tools
         [SerializeField] protected List<Transform> locs = new List<Transform>();
 
 
+
+
         // location for center line
         [SerializeField] protected Transform centerLoc = null;
 
@@ -40,7 +42,9 @@ namespace BugFreeProductions.Tools
         protected Dictionary<int, List<Vector3>> trailsByLocation = new Dictionary<int, List<Vector3>>();
         protected List<Vector3> centerLocs = new List<Vector3>();
 
-
+        [Header("Orientation trail vars")]
+        protected List<OrientationData> orientationDatas = new List<OrientationData>();
+        [SerializeField] protected Vector3 vOffset = Vector3.zero; 
         #endregion Vars
 
         #region Methods
@@ -60,6 +64,7 @@ namespace BugFreeProductions.Tools
         protected virtual void Update()
         {
             DelayPoint(Time.deltaTime);
+            
             if (allPos.Count > 0)
             {
                 if (trailMethod != null)
@@ -67,8 +72,7 @@ namespace BugFreeProductions.Tools
                     RenderTrail();
                 }
             }
-
-
+            
         }
 
         protected virtual void DelayPoint(float atime)
@@ -85,6 +89,13 @@ namespace BugFreeProductions.Tools
 
 
         protected virtual void AddPoint()
+        {
+            TwoPointsTrail();
+
+            
+        }
+
+        protected virtual void TwoPointsTrail()
         {
             // hold a list of all position list
             allPos = new List<List<Vector3>>();
@@ -111,7 +122,6 @@ namespace BugFreeProductions.Tools
             {
                 centerLocs.RemoveAt(0);
             }
-
         }
 
 
@@ -119,13 +129,42 @@ namespace BugFreeProductions.Tools
 
         protected virtual void RenderTrail()
         {
+            
             //List<List(Vector3)>
             trailMethod.RenderTrail(allPos, lineRenderers,centerLocs,lineDrift,trailOffset);
+            //trailMethod.RenderTrail(2, lineRenderers, orientationDatas, new List<OrientationDirection>{OrientationDirection.left,OrientationDirection.right}, lineDrift, trailOffset, vOffset);
         }
 
 
+        #region ISubscriber
+        // add this to subscriber delegate
+        public void OnNotify(SubMessage aSubMessage)
+        {
+
+        }
+
+        // adds Subscriber to subscription
+        public void AddSubscription()
+        {
+
+        }
+
+        // removes Subscriber to subscription
+        public void RemoveSubscription()
+        {
+
+        }
+        #endregion ISubscriber
 
 
         #endregion Methods
+    }
+
+    public enum TrailType
+    {
+        single,
+        multiPoint,
+        multiOrientation,
+        multiOrientSpawn
     }
 }

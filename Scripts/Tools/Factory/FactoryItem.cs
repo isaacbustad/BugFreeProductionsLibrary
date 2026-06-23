@@ -4,6 +4,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+//using System.Numerics;
 using UnityEngine;
 
 
@@ -24,6 +25,15 @@ namespace BugFreeProductions.Tools
             // position and align
             transform.position = aTF.position;
             transform.rotation = aTF.rotation;
+        }
+
+        public virtual void UseFactoryItem(Vector3 aPosition, Vector3 aRotation, GenericPool aGP)
+        {
+            gameObject.SetActive(true);
+            pool = aGP;
+            // position and align
+            transform.position = aPosition;
+            transform.rotation = Quaternion.Euler(aRotation);
         }
 
         #region Stuff For Object Placement
@@ -63,13 +73,13 @@ namespace BugFreeProductions.Tools
             nObjPlace.trX = objRot.x;
             nObjPlace.trY = objRot.y;
             nObjPlace.trZ = objRot.z;
-            
+
             return nObjPlace;
         }
 
         // Accessors
         public virtual string ID { get { return id; } }
-        
+
 
 
     }
