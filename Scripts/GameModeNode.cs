@@ -177,9 +177,17 @@ namespace BugFreeProductions.Tools
         }
 
         #region ISubscription
-        public void Subscribe(ISubscriber subscriber) { Debug.Log("impliment Subscribe Method"); }
+        public void Subscribe(ISubscriber subscriber) 
+        {
+            
+        }
 
-        public void NotifySubscribers()
+        public void Notify()
+        {
+            
+        }
+
+        public void UnSubscribe(ISubscriber subscriber)
         {
             
         }

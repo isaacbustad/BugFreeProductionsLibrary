@@ -17,8 +17,9 @@ namespace BugFreeProductions.Tools
         // public Action<SubMessage> notifySubscriber;
 
         // Methods
-        public void Subscribe(ISubscriber subscriber) { Debug.Log("impliment Subscribe Method"); }
+        public void Subscribe(ISubscriber subscriber);
 
-        public void NotifySubscribers();
+        public void UnSubscribe(ISubscriber subscriber);
+        public void Notify();
     }
 }

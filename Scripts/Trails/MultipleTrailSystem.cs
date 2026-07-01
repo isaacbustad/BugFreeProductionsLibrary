@@ -138,7 +138,7 @@ namespace BugFreeProductions.Tools
 
         #region ISubscriber
         // add this to subscriber delegate
-        public void OnNotify(SubMessage aSubMessage)
+        public void OnNotify(ISubscriberNotification aSubMessage)
         {
 
         }

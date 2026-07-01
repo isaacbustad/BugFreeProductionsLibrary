@@ -27,6 +27,15 @@ namespace BugFreeProductions.Tools
             transform.rotation = aTF.rotation;
         }
 
+        public virtual void UseFactoryItem(OrientationData aOD, GenericPool aGP)
+        {
+            gameObject.SetActive(true);
+            pool = aGP;
+            // position and align
+            transform.position = aOD.positionData;
+            transform.rotation = aOD.rotationData;
+        }
+
         public virtual void UseFactoryItem(Vector3 aPosition, Vector3 aRotation, GenericPool aGP)
         {
             gameObject.SetActive(true);

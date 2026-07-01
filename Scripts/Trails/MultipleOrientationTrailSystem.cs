@@ -8,13 +8,14 @@ using UnityEngine;
 namespace BugFreeProductions.Tools
 {
         
-    public class MultipleOrientationTrailSystem : MonoBehaviour
+    public class MultipleOrientationTrailSystem : MonoBehaviour, ISubscription
     {
         #region Vars
             
 
 
         [SerializeField] protected TrailMethod trailMethod;
+        [Header("Parameters to draw line")]
         [SerializeField] protected List<LineRenderer> lineRenderers;
         [SerializeField] protected List<OrientationDirection> lineDirections = new List<OrientationDirection>();
         [SerializeField] protected int maxNumberOfPoints = 100;
@@ -28,7 +29,7 @@ namespace BugFreeProductions.Tools
         List<List<Vector3>> allPos = new List<List<Vector3>>();
 
         // tracked locations
-        [SerializeField] protected List<Transform> locs = new List<Transform>();
+        // [SerializeField] protected List<Transform> locs = new List<Transform>();
 
 
 
@@ -39,7 +40,21 @@ namespace BugFreeProductions.Tools
         [Header("Orientation trail vars")]
         protected List<OrientationData> orientationDatas = new List<OrientationData>();
         [SerializeField] protected Vector3 vOffset = Vector3.zero; 
+
+
+        #region BoostRingVars
+        [Header("Trail Item Spawner")]
+        [SerializeField] protected TrailFactory_SCO trailItemFactory = null;
+        [SerializeField] protected float itemPointDelay = 0.5f;
+        [SerializeField] protected float timeToLastItem = 0f;
+
+        #endregion BoostRingVars
+
+
         #endregion Vars
+
+
+
 
         #region Methods
         protected virtual void Update()
@@ -85,6 +100,41 @@ namespace BugFreeProductions.Tools
                 timeToLastPoint = 0;
             }
         }
+
+        #region Trail Item Spawning
+        // [SerializeField] protected TrailFactory_SCO trailItemSpawn = null;
+        // [SerializeField] protected float itemPointDelay = 0.5f;
+        // [SerializeField] protected float timeToLastItem = 0f;
+
+        
+        protected virtual void DelayItemSpawn(float aTime)
+        {
+            // add to time since last spawn
+            timeToLastItem += aTime;
+
+            // Call and reset
+            // trailItemFactory.CreateItem(orientationDatas[orientationDatas.Count - 1], this);
+
+        }
+        #endregion Trail Item Spawning
+
+        #region ImplimentISubScriber
+        public void Subscribe(ISubscriber subscriber)
+        {
+            
+        }
+
+        public void Notify()
+        {
+
+        }
+
+        public void UnSubscribe(ISubscriber subscriber)
+        {
+            
+        }
+
+        #endregion ImplimentISubscriber
         
         #endregion Methods
     }

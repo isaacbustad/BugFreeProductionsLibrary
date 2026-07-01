@@ -23,7 +23,7 @@ namespace BugFreeProductions.Tools
         [SerializeField] protected Vector3 bulDevMax = Vector3.zero;
 
         
-
+    
 
         // Methods
         public override void UseFactoryItem(Transform aTF, GenericPool aGP)
