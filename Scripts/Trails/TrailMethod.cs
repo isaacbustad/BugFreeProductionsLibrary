@@ -270,7 +270,7 @@ namespace BugFreeProductions.Tools
             
         }
 
-        public void RenderTrail(int aTrailCount, List<LineRenderer> aAllLRs, List<OrientationData> aOrientations, List<OrientationDirection> aDirections, float aDrift, float aTrailOffset, Vector3 aOffset)
+        public void RenderTrail(List<LineRenderer> aAllLRs, List<OrientationData> aOrientations, List<OrientationDirection> aDirections, float aDrift, float aTrailOffset, Vector3 aOffset)
         {
             //Dictionary<OrientationDirection, List<Vector3>> trailsByData = new Dictionary<OrientationDirection, List<Vector3>>();
             List<List<Vector3>> allTrailList = new List<List<Vector3>>();

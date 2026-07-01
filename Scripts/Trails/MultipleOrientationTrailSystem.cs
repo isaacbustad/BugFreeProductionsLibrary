@@ -1,6 +1,7 @@
 // Created By   :   Isaac Bustad
 // Created      :   6/22/2026
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,6 +12,12 @@ namespace BugFreeProductions.Tools
     public class MultipleOrientationTrailSystem : MonoBehaviour, ISubscription
     {
         #region Vars
+        // class assigned data
+        // notification delegate
+        protected Action<ISubscriberNotification> onNotify;
+
+        // notification data
+        protected ISubscriberNotification subscriberNotification;
             
 
 
@@ -44,7 +51,7 @@ namespace BugFreeProductions.Tools
 
         #region BoostRingVars
         [Header("Trail Item Spawner")]
-        [SerializeField] protected TrailFactory_SCO trailItemFactory = null;
+        [SerializeField] protected SubscribingFactory_SCO trailItemFactory = null;
         [SerializeField] protected float itemPointDelay = 0.5f;
         [SerializeField] protected float timeToLastItem = 0f;
 
@@ -57,6 +64,12 @@ namespace BugFreeProductions.Tools
 
 
         #region Methods
+        #region Unity Methods
+        protected virtual void OnEnable()
+        {
+
+        }
+
         protected virtual void Update()
         {
             DelayPoint(Time.deltaTime);
@@ -68,6 +81,9 @@ namespace BugFreeProductions.Tools
 
 
         }
+
+        #endregion Unity Methods
+
         protected virtual void AddPoint()
         {
             //TwoPointsTrail();
@@ -83,10 +99,8 @@ namespace BugFreeProductions.Tools
 
         protected virtual void RenderTrail()
         {
-            
-            //List<List(Vector3)>
-            //trailMethod.RenderTrail(allPos, lineRenderers,centerLocs,lineDrift,trailOffset);
-            trailMethod.RenderTrail(2, lineRenderers, orientationDatas, lineDirections, lineDrift, trailOffset, vOffset);
+            // 
+            trailMethod.RenderTrail(lineRenderers, orientationDatas, lineDirections, lineDrift, trailOffset, vOffset);
         }
 
         protected virtual void DelayPoint(float atime)
@@ -102,39 +116,35 @@ namespace BugFreeProductions.Tools
         }
 
         #region Trail Item Spawning
-        // [SerializeField] protected TrailFactory_SCO trailItemSpawn = null;
-        // [SerializeField] protected float itemPointDelay = 0.5f;
-        // [SerializeField] protected float timeToLastItem = 0f;
-
-        
         protected virtual void DelayItemSpawn(float aTime)
         {
             // add to time since last spawn
             timeToLastItem += aTime;
 
             // Call and reset
-            // trailItemFactory.CreateItem(orientationDatas[orientationDatas.Count - 1], this);
+            // OrientationData aod = orientationDatas[orientationDatas.Count - 1];
+            trailItemFactory.CreateItem(orientationDatas[orientationDatas.Count - 1], this);
 
         }
         #endregion Trail Item Spawning
 
-        #region ImplimentISubScriber
+        #region ImplementISubscription
         public void Subscribe(ISubscriber subscriber)
         {
-            
+            onNotify += subscriber.Notify;
         }
 
         public void Notify()
         {
-
+            onNotify.Invoke(subscriberNotification);
         }
 
         public void UnSubscribe(ISubscriber subscriber)
         {
-            
+            onNotify -= subscriber.Notify;
         }
 
-        #endregion ImplimentISubscriber
+        #endregion ImplementISubScription
         
         #endregion Methods
     }

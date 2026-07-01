@@ -43,7 +43,7 @@ namespace BugFreeProductions.Tools
         protected List<Vector3> centerLocs = new List<Vector3>();
 
         [Header("Orientation trail vars")]
-        protected List<OrientationData> orientationDatas = new List<OrientationData>();
+        //protected List<OrientationData> orientationDatas = new List<OrientationData>();
         [SerializeField] protected Vector3 vOffset = Vector3.zero; 
         #endregion Vars
 

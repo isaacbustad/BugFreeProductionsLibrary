@@ -8,7 +8,7 @@ using UnityEngine;
 namespace BugFreeProductions.Tools
 {
     [CreateAssetMenu(fileName = "TrailFactory_SCO", menuName = "ScriptableObject/TrailFactory_SCO")]
-    public class TrailFactory_SCO : GenericFactory_SCO
+    public class SubscribingFactory_SCO : GenericFactory_SCO
     {
         #region Vars
         protected ISubscription subscription = null;
@@ -18,9 +18,16 @@ namespace BugFreeProductions.Tools
 
         #region Methods
         // orientation data, pool , the thing I want to subscribe to
-        protected virtual void CreateItem(OrientationData aOD, ISubscription aSubscription)
+        public virtual FactoryItem CreateItem(OrientationData aOD, ISubscription aSubscription)
         {
-            CreateItem(aOD);
+            // Create a factory Item
+            FactoryItem fi = base.CreateItem(aOD);
+
+            if (fi.GetComponent<SubscribingFactoryItem>() is SubscribingFactoryItem sfi)
+            {
+                sfi.Subscribe(aSubscription);
+            }
+            return fi;
         }
 
 

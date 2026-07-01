@@ -21,7 +21,7 @@ namespace BugFreeProductions.Tools
 
         // Methods
         #region Create Factory Items
-        public virtual void CreateItem(Transform createInfo)
+        public virtual FactoryItem CreateItem(Transform createInfo)
         {
             // create ref for pool to return to
             Poolable aFact = null;
@@ -29,11 +29,14 @@ namespace BugFreeProductions.Tools
             // check pool for reusable item
             pool.PoolChk(ref aFact);
 
+            // hold Factory Item for return
+            FactoryItem fi = null;
+
             // use new only if none were pooled
             if (aFact != null)
             {
                 // reuse pooled item
-                FactoryItem fi = aFact.GetComponent<FactoryItem>();
+                fi = aFact.GetComponent<FactoryItem>();
                 if (fi != null)
                 {
                     fi.UseFactoryItem(createInfo, pool);
@@ -44,7 +47,7 @@ namespace BugFreeProductions.Tools
             {
                 // create new item
                 GameObject nGO = Instantiate(factoryItem, createInfo.position, createInfo.rotation);
-                FactoryItem fi = nGO.GetComponent<FactoryItem>();
+                fi = nGO.GetComponent<FactoryItem>();
 
                 if(fi != null)
                 {
@@ -52,9 +55,11 @@ namespace BugFreeProductions.Tools
                 }
             }
 
+            return fi;
+
         }
 
-        public virtual void CreateItem(OrientationData createInfo)
+        public virtual FactoryItem CreateItem(OrientationData createInfo)
         {
             // create ref for pool to return to
             Poolable aFact = null;
@@ -62,11 +67,14 @@ namespace BugFreeProductions.Tools
             // check pool for reusable item
             pool.PoolChk(ref aFact);
 
+            // hold Factory Item for return
+            FactoryItem fi = null;
+
             // use new only if none were pooled
             if (aFact != null)
             {
                 // reuse pooled item
-                FactoryItem fi = aFact.GetComponent<FactoryItem>();
+                fi = aFact.GetComponent<FactoryItem>();
                 if (fi != null)
                 {
                     fi.UseFactoryItem(createInfo, pool);
@@ -77,17 +85,17 @@ namespace BugFreeProductions.Tools
             {
                 // create new item
                 GameObject nGO = Instantiate(factoryItem, createInfo.positionData, createInfo.rotationData);
-                FactoryItem fi = nGO.GetComponent<FactoryItem>();
+                fi = nGO.GetComponent<FactoryItem>();
 
                 if(fi != null)
                 {
                     fi.UseFactoryItem(createInfo, pool);
                 }
             }
-
+            return fi;
         }
 
-        public virtual void CreateItem(ObjectPlacement aPlacement)
+        public virtual FactoryItem CreateItem(ObjectPlacement aPlacement)
         {
             // create ref for pool to return to
             Poolable aFact = null;
@@ -95,11 +103,13 @@ namespace BugFreeProductions.Tools
             // check pool for reusable item
             pool.PoolChk(ref aFact);
 
+            FactoryItem fi = null;
+
             // use new only if none were pooled
             if (aFact != null)
             {
                 // reuse pooled item
-                FactoryItem fi = aFact.GetComponent<FactoryItem>();
+                fi = aFact.GetComponent<FactoryItem>();
                 if (fi != null)
                 {
                     fi.UseFactoryItem(aPlacement, pool);
@@ -110,13 +120,15 @@ namespace BugFreeProductions.Tools
             {
                 // create new item
                 GameObject nGO = Instantiate(factoryItem, Vector3.zero, Quaternion.identity);
-                FactoryItem fi = nGO.GetComponent<FactoryItem>();
+                fi = nGO.GetComponent<FactoryItem>();
 
                 if (fi != null)
                 {
                     fi.UseFactoryItem(aPlacement, pool);
                 }
             }
+
+            return fi;
 
         }
 
