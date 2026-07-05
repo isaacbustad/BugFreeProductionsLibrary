@@ -17,26 +17,26 @@ namespace BugFreeProductions.Tools
         #region Methods
 
         #region Implement ISubscriber
-        public void Notify(ISubscriberNotification aSubMessage)
+        public void OnNotify(ISubscriberNotification aSubMessage)
         {
 
         }
 
         // adds Subscriber to subscription
-        public void Subscribe()
+        public void OnSubscribe()
         {
 
         }
 
         // adds Subscriber to subscription
-        public void Subscribe(ISubscription aSubscription)
+        public void OnSubscribe(ISubscription aSubscription)
         {
             aSubscription.Subscribe(this);
             subscriptions.Add(aSubscription);
         }
 
         // removes Subscriber to subscription
-        public void UnSubscribe()
+        public void OnUnSubscribe()
         {
             foreach (ISubscription aSubscription in subscriptions)
             {

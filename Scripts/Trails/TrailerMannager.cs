@@ -47,7 +47,7 @@ namespace BugFreeProductions.Tools
         public void Subscribe(ISubscriber subscriber)
         {
             //subscribers.Add(subscriber);
-            notifySubscriber += subscriber.Notify;
+            notifySubscriber += subscriber.OnNotify;
         }
 
         public void Notify()

@@ -25,7 +25,7 @@ namespace BugFreeProductions.Tools
 
             if (fi.GetComponent<SubscribingFactoryItem>() is SubscribingFactoryItem sfi)
             {
-                sfi.Subscribe(aSubscription);
+                sfi.OnSubscribe(aSubscription);
             }
             return fi;
         }

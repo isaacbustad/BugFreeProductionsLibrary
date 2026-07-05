@@ -1,30 +1,52 @@
 // Created By   :   Isaac Bustad
-// Created      :   6/30/2026
+// Created      :   7/4/2026
 
-using BugFreeProductions.Tools;
+using System.Collections;
 using UnityEngine;
 
 namespace BugFreeProductions.Tools
 {
-    public class TrailItem : FactoryItem, ISubscriber
+
+    public class TrailItem : MonoBehaviour
     {
-        #region ISubscriber Implimentation
-        public void Notify(ISubscriberNotification aSubMessage)
+        #region Vars
+        [SerializeField] protected bool sizeOverTime = false;
+
+        [Header("Scaler Settings")]
+        [SerializeField] protected float maxScale = 1f;
+        [SerializeField] protected float minScale = 1f;
+        
+
+        // clock
+        [SerializeField] protected Clock_SCO clock = null;
+
+        #endregion Vars
+
+
+        #region Methods
+
+        #region Unity Methods
+        protected virtual void OnEnable()
         {
 
         }
+        #endregion Unity Methods
 
-        // adds Subscriber to subscription
-        public void Subscribe()
+        protected virtual void ScaleItem()
         {
-
+            // if (clock.CheckTimeStep(ref timeToLastItem,itemPointDelay))
+            // {
+                
+            // }
         }
 
-        // removes Subscriber to subscription
-        public void UnSubscribe()
-        {
-            
-        }
-        #endregion ISubscriber Implimentation
+
+        
+        #endregion Methods
+
+
+        #region Accessors
+
+        #endregion Accessors
     }
 }

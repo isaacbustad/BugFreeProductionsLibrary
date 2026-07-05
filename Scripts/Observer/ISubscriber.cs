@@ -12,13 +12,13 @@ namespace BugFreeProductions.Tools
         // Methods
         // runs when Subscription notifies subscribers
         // add this to subscriber delegate
-        public void Notify(ISubscriberNotification aSubMessage);
+        public void OnNotify(ISubscriberNotification aSubMessage);
 
         // adds Subscriber to subscription
-        public void Subscribe();
+        public void OnSubscribe();
 
         // removes Subscriber to subscription
-        public void UnSubscribe();
+        public void OnUnSubscribe();
 
 
     }

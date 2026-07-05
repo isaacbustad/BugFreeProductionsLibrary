@@ -32,31 +32,12 @@ namespace BugFreeProductions.Tools
         [SerializeField] protected float lineDrift = 0f;
         [SerializeField] protected float trailOffset = 0f;
 
-        // List of all the current trail points
-        List<List<Vector3>> allPos = new List<List<Vector3>>();
-
-        // tracked locations
-        // [SerializeField] protected List<Transform> locs = new List<Transform>();
-
-
-
-
         
         
 
         [Header("Orientation trail vars")]
         protected List<OrientationData> orientationDatas = new List<OrientationData>();
         [SerializeField] protected Vector3 vOffset = Vector3.zero; 
-
-
-        #region BoostRingVars
-        [Header("Trail Item Spawner")]
-        [SerializeField] protected SubscribingFactory_SCO trailItemFactory = null;
-        [SerializeField] protected float itemPointDelay = 0.5f;
-        [SerializeField] protected float timeToLastItem = 0f;
-
-        #endregion BoostRingVars
-
 
         #endregion Vars
 
@@ -115,23 +96,12 @@ namespace BugFreeProductions.Tools
             }
         }
 
-        #region Trail Item Spawning
-        protected virtual void DelayItemSpawn(float aTime)
-        {
-            // add to time since last spawn
-            timeToLastItem += aTime;
-
-            // Call and reset
-            // OrientationData aod = orientationDatas[orientationDatas.Count - 1];
-            trailItemFactory.CreateItem(orientationDatas[orientationDatas.Count - 1], this);
-
-        }
-        #endregion Trail Item Spawning
+        
 
         #region ImplementISubscription
         public void Subscribe(ISubscriber subscriber)
         {
-            onNotify += subscriber.Notify;
+            onNotify += subscriber.OnNotify;
         }
 
         public void Notify()
@@ -141,7 +111,7 @@ namespace BugFreeProductions.Tools
 
         public void UnSubscribe(ISubscriber subscriber)
         {
-            onNotify -= subscriber.Notify;
+            onNotify -= subscriber.OnNotify;
         }
 
         #endregion ImplementISubScription
