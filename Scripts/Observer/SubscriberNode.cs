@@ -44,6 +44,12 @@ namespace BugFreeProductions.Tools
 
         }
 
+         // adds Subscriber to subscription
+        public void OnSubscribe(ISubscription aSubscription)
+        {
+            
+        }
+
         // removes Subscriber to subscription
         public void OnUnSubscribe()
         {

@@ -3,26 +3,112 @@
 
 
 
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 namespace BugFreeProductions.Tools
 {
 
     [CreateAssetMenu(fileName = "Clock_SCO", menuName = "ScriptableObject/Clock_SCO")]
-    public class Clock_SCO : ScriptableObject
+    [InitializeOnLoad]
+    public class Clock_SCO : ScriptableObject, ISubscription
     {
+        #region Vars
+        [SerializeField] protected float timeInterval = 1f;
+        [SerializeField] protected float timeElapsed = 0f;
+
+        [SerializeField] protected List<ISubscriber> subscribers = new List<ISubscriber>();
+        protected int curIdx = 0;
+
+        protected ISubscriberNotification subMessage;
+
+
+        #endregion Vars
+
         #region Methods
-        public virtual bool CheckTimeStep(ref float timeElapsed, float timeStep)
+        public virtual void Setup()
         {
-            if (timeElapsed >= timeStep)
+            subMessage = new ClockNotification(timeInterval,false);
+        }
+
+        public virtual void CheckTimeStep()
+        {
+            if (TimeInterval > 0)
             {
-                timeElapsed = 0;
-                return true;
+                while (timeElapsed >= TimeInterval)
+                {
+                    // if the index is out of bounds reset
+                    if (curIdx >= subscribers.Count)
+                    {
+                        curIdx = 0;
+                    }
+
+                    // decrement the time elapsed
+                    // serves as loop exit condition
+                    timeElapsed -= timeInterval;
+
+                    // notify the current subscriber
+                    subscribers[curIdx].OnNotify(subMessage);
+
+                    // increment index
+                    curIdx++;
+
+                }
             }
-            return false;
 
         }
+
+        public virtual void RunClock(float aDeltaTime)
+        {
+            timeElapsed += aDeltaTime;
+            CheckTimeStep();
+        }
+
+        #region  Implement ISubscription
+        public void Subscribe(ISubscriber subscriber)
+        {
+            subscribers.Add(subscriber);
+
+        }
+
+        public void UnSubscribe(ISubscriber subscriber)
+        {
+            subscribers.Remove(subscriber);
+        }
+        public void Notify()
+        {
+            // RunClock notifies all subscribers
+
+        }
+
+        #endregion Implement ISubscription
+
+
         #endregion Methods
+
+
+        #region Accessors
+        public virtual float TimeInterval
+        {
+            get
+            {
+                if (subscribers.Count > 0)
+                {
+                    return timeInterval / subscribers.Count;
+                }
+
+                else
+                {
+                    return 0;
+                }
+                
+            }
+        }
+
+        #endregion Accessors
+
+        
 
     }
 }

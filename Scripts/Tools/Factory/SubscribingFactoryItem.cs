@@ -19,30 +19,52 @@ namespace BugFreeProductions.Tools
         #region Implement ISubscriber
         public void OnNotify(ISubscriberNotification aSubMessage)
         {
-
+            ItemNotify(aSubMessage);
         }
 
         // adds Subscriber to subscription
         public void OnSubscribe()
         {
-
+            ItemOnSubscribe();
         }
 
         // adds Subscriber to subscription
         public void OnSubscribe(ISubscription aSubscription)
         {
-            aSubscription.Subscribe(this);
-            subscriptions.Add(aSubscription);
+            ItemOnSubscribe(aSubscription);
         }
 
         // removes Subscriber to subscription
         public void OnUnSubscribe()
+        {
+            ItemOnUnSubscribe();
+        }
+
+        
+
+        protected virtual void ItemOnSubscribe(ISubscription aSubscription)
+        {
+            aSubscription.Subscribe(this);
+            subscriptions.Add(aSubscription);
+        }
+
+        protected virtual void ItemOnSubscribe()
+        {
+            
+        }
+
+        protected virtual void ItemOnUnSubscribe()
         {
             foreach (ISubscription aSubscription in subscriptions)
             {
                 aSubscription.UnSubscribe(this);
                 subscriptions.Remove(aSubscription);
             }
+        }
+
+        protected virtual void ItemNotify(ISubscriberNotification aSubMessage)
+        {
+
         }
         
         #endregion Implement ISubscriber

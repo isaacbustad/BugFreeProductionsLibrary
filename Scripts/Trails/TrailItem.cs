@@ -7,14 +7,16 @@ using UnityEngine;
 namespace BugFreeProductions.Tools
 {
 
-    public class TrailItem : MonoBehaviour
+    public class TrailItem : SubscribingFactoryItem
     {
-        #region Vars
-        [SerializeField] protected bool sizeOverTime = false;
+        #region Vars        
+        [SerializeField] protected ItemScaleMode itemScaleSetting = ItemScaleMode.none;
 
         [Header("Scaler Settings")]
-        [SerializeField] protected float maxScale = 1f;
-        [SerializeField] protected float minScale = 1f;
+        [SerializeField] protected float maxScale = 2f;
+        [SerializeField] protected float minScale = .5f;
+
+        [SerializeField] protected float scaleRate = 1.01f;
         
 
         // clock
@@ -28,25 +30,71 @@ namespace BugFreeProductions.Tools
         #region Unity Methods
         protected virtual void OnEnable()
         {
-
+            Setup();
         }
         #endregion Unity Methods
 
-        protected virtual void ScaleItem()
+        protected virtual void Setup()
         {
-            // if (clock.CheckTimeStep(ref timeToLastItem,itemPointDelay))
-            // {
-                
-            // }
+            switch (itemScaleSetting)
+            {
+                case ItemScaleMode.none:
+                    break;
+
+                case ItemScaleMode.grow:
+                    break;
+
+                case ItemScaleMode.shrink:
+                    break;
+
+                case ItemScaleMode.bound:
+                    break;
+
+            }
         }
 
+        protected virtual void ScaleItem()
+        {
+            
 
-        
+
+            // switch (itemScaleSetting)
+            // {
+            //     case ItemScaleMode.none:
+            //         break;
+
+            //     case ItemScaleMode.grow:
+            //         break;
+
+            //     case ItemScaleMode.shrink:
+            //         break;
+
+            //     case ItemScaleMode.bound:
+            //         break;
+
+            // }
+            
+        }
+
+        protected override void ItemNotify(ISubscriberNotification aSubMessage)
+        {
+            ScaleItem();
+        }
+
         #endregion Methods
 
 
         #region Accessors
 
         #endregion Accessors
+    }
+
+
+    public enum ItemScaleMode
+    {
+        none,
+        grow,
+        shrink,
+        bound
     }
 }
