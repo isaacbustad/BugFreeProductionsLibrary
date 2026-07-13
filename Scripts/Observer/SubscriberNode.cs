@@ -56,6 +56,12 @@ namespace BugFreeProductions.Tools
 
         }
 
+        // removes Subscriber to subscription
+        public void OnUnSubscribe(ISubscription aSubscription)
+        {
+            
+        }
+
 
         #endregion Implement Subscriber
         

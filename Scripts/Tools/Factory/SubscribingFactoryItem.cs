@@ -10,7 +10,7 @@ namespace BugFreeProductions.Tools
     public class SubscribingFactoryItem : FactoryItem, ISubscriber
     {
         #region Vars
-        protected List<ISubscription> subscriptions = new List<ISubscription>();
+        //protected List<ISubscription> subscriptions = new List<ISubscription>();
         #endregion Vars
 
 
@@ -40,12 +40,18 @@ namespace BugFreeProductions.Tools
             ItemOnUnSubscribe();
         }
 
+        // removes Subscriber to subscription
+        public void OnUnSubscribe(ISubscription aSubscription)
+        {
+            
+        }
+
         
 
         protected virtual void ItemOnSubscribe(ISubscription aSubscription)
         {
             aSubscription.Subscribe(this);
-            subscriptions.Add(aSubscription);
+            //subscriptions.Add(aSubscription);
         }
 
         protected virtual void ItemOnSubscribe()
@@ -55,17 +61,24 @@ namespace BugFreeProductions.Tools
 
         protected virtual void ItemOnUnSubscribe()
         {
-            foreach (ISubscription aSubscription in subscriptions)
-            {
-                aSubscription.UnSubscribe(this);
-                subscriptions.Remove(aSubscription);
-            }
+            // foreach (ISubscription aSubscription in subscriptions)
+            // {
+            //     aSubscription.UnSubscribe(this);
+            //     subscriptions.Remove(aSubscription);
+            // }
         }
 
         protected virtual void ItemNotify(ISubscriberNotification aSubMessage)
         {
 
         }
+
+        protected virtual void ItemOnUnSubscribe(ISubscription aSubscription)
+        {
+            //subscriptions.Remove(aSubscription);
+        }
+
+        
         
         #endregion Implement ISubscriber
 

@@ -60,7 +60,10 @@ namespace BugFreeProductions.Tools
 
         protected virtual void OnDestroy()
         {
-            pool.RevFromPool(this);
+            if (pool != null)
+            {
+                pool.RevFromPool(this);
+            }            
         }
 
 

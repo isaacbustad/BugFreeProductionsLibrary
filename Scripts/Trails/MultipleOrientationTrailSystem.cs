@@ -9,7 +9,7 @@ using UnityEngine;
 namespace BugFreeProductions.Tools
 {
         
-    public class MultipleOrientationTrailSystem : MonoBehaviour, ISubscription
+    public class MultipleOrientationTrailSystem : MonoBehaviour, ISubscription, ISubscriber
     {
         #region Vars
         // class assigned data
@@ -32,6 +32,8 @@ namespace BugFreeProductions.Tools
         [SerializeField] protected float lineDrift = 0f;
         [SerializeField] protected float trailOffset = 0f;
 
+        [SerializeField] protected Clock_SCO trailClock;
+
         
         
 
@@ -48,34 +50,70 @@ namespace BugFreeProductions.Tools
         #region Unity Methods
         protected virtual void OnEnable()
         {
-
+            Setup();
         }
 
         protected virtual void Update()
         {
-            DelayPoint(Time.deltaTime);
+            // DelayPoint(Time.deltaTime);
             
-            if (trailMethod != null)
-            {
-                RenderTrail();
-            }
+            // if (trailMethod != null)
+            // {
+            //     RenderTrail();
+            // }
 
 
         }
 
         #endregion Unity Methods
 
+        protected virtual void Setup()
+        {
+            subscriberNotification = new TrailSystemNotification(
+                                        new OrientationData(
+                                            transform.position,
+                                            transform.rotation),
+                                            new OrientationData(
+                                            transform.position,
+                                            transform.rotation),
+                                            10);
+
+
+            // subscribe to assigned clock
+            if (trailClock != null)
+            {
+                trailClock.Subscribe(this);
+            }
+        }
+
         protected virtual void AddPoint()
         {
             //TwoPointsTrail();
 
-            OrientationData od = new OrientationData(transform.position,transform.rotation);
+            OrientationData od = new OrientationData(transform.position + (transformHandle.rotation * vOffset),transform.rotation);
             orientationDatas.Add(od);
 
             while(orientationDatas.Count > maxNumberOfPoints)
             {
                 orientationDatas.RemoveAt(0);
             }
+
+            // update the orientation data of the notification
+            if (subscriberNotification is TrailSystemNotification tsn)
+            {
+                // capture the current struct value
+                // for the notification
+                TrailSystemNotification aTSN = new TrailSystemNotification(orientationDatas[^1], orientationDatas[0], 10);
+
+                // alter the copy
+                // aTSN.orientationData = orientationDatas[^1];
+
+                // reassign to update
+                subscriberNotification = aTSN;
+
+            }
+
+
         }
 
         protected virtual void RenderTrail()
@@ -115,6 +153,43 @@ namespace BugFreeProductions.Tools
         }
 
         #endregion ImplementISubScription
+
+        #region Implement ISubscribe
+        public void OnNotify(ISubscriberNotification aSubMessage)
+        {
+            if (aSubMessage is ClockNotification clockNotification)
+            {
+                AddPoint();
+                RenderTrail();
+                Notify();
+            }
+        }
+
+        // adds Subscriber to subscription
+        public void OnSubscribe()
+        {
+
+        }
+
+        // adds Subscriber to subscription
+        public void OnSubscribe(ISubscription aSubscription)
+        {
+
+        }
+
+        // removes Subscriber to subscription
+        public void OnUnSubscribe()
+        {
+
+        }
+
+        // removes Subscriber to subscription
+        public void OnUnSubscribe(ISubscription aSubscription)
+        {
+
+        }
+
+        #endregion Implement ISubscribe
         
         #endregion Methods
     }

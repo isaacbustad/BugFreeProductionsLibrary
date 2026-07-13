@@ -10,7 +10,7 @@ namespace BugFreeProductions.Tools
     public class TrailItem : SubscribingFactoryItem
     {
         #region Vars        
-        [SerializeField] protected ItemScaleMode itemScaleSetting = ItemScaleMode.none;
+        //[SerializeField] protected ItemScaleMode itemScaleSetting = ItemScaleMode.none;
 
         [Header("Scaler Settings")]
         [SerializeField] protected float maxScale = 2f;
@@ -20,7 +20,7 @@ namespace BugFreeProductions.Tools
         
 
         // clock
-        [SerializeField] protected Clock_SCO clock = null;
+        //[SerializeField] protected Clock_SCO clock = null;
 
         #endregion Vars
 
@@ -36,49 +36,44 @@ namespace BugFreeProductions.Tools
 
         protected virtual void Setup()
         {
-            switch (itemScaleSetting)
-            {
-                case ItemScaleMode.none:
-                    break;
-
-                case ItemScaleMode.grow:
-                    break;
-
-                case ItemScaleMode.shrink:
-                    break;
-
-                case ItemScaleMode.bound:
-                    break;
-
-            }
-        }
-
-        protected virtual void ScaleItem()
-        {
-            
-
-
-            // switch (itemScaleSetting)
+            // if (clock != null)
             // {
-            //     case ItemScaleMode.none:
-            //         break;
-
-            //     case ItemScaleMode.grow:
-            //         break;
-
-            //     case ItemScaleMode.shrink:
-            //         break;
-
-            //     case ItemScaleMode.bound:
-            //         break;
-
+            //     clock.Subscribe(this);
             // }
             
         }
 
+
+
+        
+
         protected override void ItemNotify(ISubscriberNotification aSubMessage)
         {
-            ScaleItem();
+            
+        }
+
+        protected override void ItemOnSubscribe()
+        {
+            //clock.Subscribe(this);
+        }
+
+        protected override void ItemOnUnSubscribe()
+        {
+            // Pool Ourself
+            PoolSelf();
+        }
+        protected override void ItemOnUnSubscribe(ISubscription aSubscription)
+        {
+            // Pool Ourself
+            PoolSelf();
+
+        }
+
+        protected override void PoolSelf()
+        {
+            base.PoolSelf();
+
+            gameObject.SetActive(false);
         }
 
         #endregion Methods
@@ -90,11 +85,4 @@ namespace BugFreeProductions.Tools
     }
 
 
-    public enum ItemScaleMode
-    {
-        none,
-        grow,
-        shrink,
-        bound
-    }
 }

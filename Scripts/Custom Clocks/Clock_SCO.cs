@@ -5,13 +5,12 @@
 
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 
 namespace BugFreeProductions.Tools
 {
 
     [CreateAssetMenu(fileName = "Clock_SCO", menuName = "ScriptableObject/Clock_SCO")]
-    [InitializeOnLoad]
+    
     public class Clock_SCO : ScriptableObject, ISubscription
     {
         #region Vars
@@ -27,6 +26,10 @@ namespace BugFreeProductions.Tools
         #endregion Vars
 
         #region Methods
+        protected virtual void OnEnable()
+        {
+            Setup();
+        }
         public virtual void Setup()
         {
             subMessage = new ClockNotification(timeInterval,false);
@@ -46,7 +49,7 @@ namespace BugFreeProductions.Tools
 
                     // decrement the time elapsed
                     // serves as loop exit condition
-                    timeElapsed -= timeInterval;
+                    timeElapsed -= TimeInterval;
 
                     // notify the current subscriber
                     subscribers[curIdx].OnNotify(subMessage);
@@ -75,6 +78,7 @@ namespace BugFreeProductions.Tools
         public void UnSubscribe(ISubscriber subscriber)
         {
             subscribers.Remove(subscriber);
+            //subscriber.OnUnSubscribe();
         }
         public void Notify()
         {
@@ -93,7 +97,7 @@ namespace BugFreeProductions.Tools
         {
             get
             {
-                if (subscribers.Count > 0)
+                if (subscribers.Count > 0 && timeInterval > 0)
                 {
                     return timeInterval / subscribers.Count;
                 }

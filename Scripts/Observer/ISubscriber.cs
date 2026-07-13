@@ -23,6 +23,9 @@ namespace BugFreeProductions.Tools
         // removes Subscriber to subscription
         public void OnUnSubscribe();
 
+        // removes Subscriber to subscription
+        public void OnUnSubscribe(ISubscription aSubscription);
+
         
 
 

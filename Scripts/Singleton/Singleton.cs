@@ -5,7 +5,8 @@
 
 using UnityEngine;
 
-
+// abstract class that we cannot instantiate
+// pass in type we want to make single
 public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {
     private static T instance;
