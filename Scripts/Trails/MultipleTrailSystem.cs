@@ -112,7 +112,7 @@ namespace BugFreeProductions.Tools
 
                 // update all positions
                 allPos.Add(aKVP.Value);
-                Debug.Log("All Pos: " + allPos.Count);
+                //Debug.Log("All Pos: " + allPos.Count);
 
             }
 

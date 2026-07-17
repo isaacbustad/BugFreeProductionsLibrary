@@ -39,6 +39,16 @@ namespace BugFreeProductions.Extentions
             tV3.z = Mathf.Clamp(tV3.z, 0, aMag);
         }
 
+        public static Quaternion CalcNewRotation( Vector3 startForward, Vector3 endForward, Vector3 startUp, Vector3 endUp, float rateOfDecay)
+        {
+            Vector3 targetForward = (1f - rateOfDecay) * startForward + rateOfDecay * endForward;
+            Vector3 targetUp = (1f - rateOfDecay) * startUp + rateOfDecay * endUp;
+
+            return Quaternion.LookRotation(targetForward,targetUp);
+        }
+
+        
+
         public static float CalcAngleViaSides(float oppSide, float oth1, float oth2)
         {
             float top = (oppSide * oppSide) - (oth1 * oth1) - (oth2 * oth2);
@@ -47,6 +57,8 @@ namespace BugFreeProductions.Extentions
 
             return Mathf.Acos(fract) * Mathf.Rad2Deg;
         }
+
+        
         // Accessors
         //public static float WorldSpeed { get { return worldSpeed; } }
         #endregion

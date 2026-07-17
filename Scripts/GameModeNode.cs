@@ -140,7 +140,7 @@ namespace BugFreeProductions.Tools
                     }
 
                 }
-                Debug.LogError("Plater found: " + this.name);
+                Debug.LogError("Player found: " + this.name);
             }
             else if(playerNodes.Count < spics.Count)
             {

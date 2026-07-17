@@ -27,7 +27,7 @@ namespace BugFreeProductions.Tools
                 clock.Setup();
             }
         }
-        protected virtual void Update()
+        protected virtual void LateUpdate()
         {
             RunClocks();
         }

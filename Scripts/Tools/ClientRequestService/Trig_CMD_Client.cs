@@ -15,8 +15,18 @@ namespace BugFreeProductions.Tools
 
 
 
-        // Methods
+        // Methods          
         protected virtual void OnTriggerEnter(Collider other)
+        {
+            TrigRequest(other);
+        }
+
+        protected virtual void OnTriggerExit(Collider other)
+        {
+            
+        }
+
+        protected virtual void TrigRequest(Collider other)
         {
             //other.attachedRigidbody.gameObject.name = "here is collision";
             //Debug.Log("Found it " + other.gameObject.name);

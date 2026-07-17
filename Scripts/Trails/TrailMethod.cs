@@ -54,7 +54,7 @@ namespace BugFreeProductions.Tools
         {
             // store new lists of positions
             //List<List<Vector3>> nAllPos = CalculateNewListOfPositions(aAllPos);
-            Debug.Log("CallMe");
+            //Debug.Log("CallMe");
             // Draw the Lines nPos1.Add(aPos1[i] - (driftDir*i*aDrift/100));
             for (int l = 0; l < aAllPos.Count; l++)
             {
@@ -301,7 +301,7 @@ namespace BugFreeProductions.Tools
                 allTrailList.Add(posLst);
             }
             RenderTrail(allTrailList, aAllLRs);
-            Debug.Log("New Render Ran");
+            //Debug.Log("New Render Ran");
             
         }
 

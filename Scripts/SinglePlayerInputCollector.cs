@@ -64,25 +64,51 @@ namespace BugFreeProductions.Tools
 
         // expext callback context
         // WSAD and left stick
-        public virtual void FourWayInput(InputAction.CallbackContext aCON)
+        public virtual void LeftStickAndWSAD(InputAction.CallbackContext aCON)
         {
             //Debug.Log(aCON.ReadValue<Vector2>());
             if (playerNode != null)
             {
-                playerNode.FourWayInput(aCON);
+                playerNode.LeftStickAndWSAD(aCON);
             }
         }
         #endregion
 
         #region AuxButtons for extra functionality
         // expect button callback
-        public virtual void AuxButtonPress(InputAction.CallbackContext aCON)
+        public virtual void ButtonA(InputAction.CallbackContext aCON)
         {
             if (playerNode != null)
             {
-                playerNode.AuxButtonPress(aCON);
+                playerNode.ButtonA(aCON);
             }
         }
+
+        public virtual void ButtonB(InputAction.CallbackContext aCON)
+        {
+            if (playerNode != null)
+            {
+                playerNode.ButtonB(aCON);
+            }
+        }
+
+        public virtual void ButtonX(InputAction.CallbackContext aCON)
+        {
+            if (playerNode != null)
+            {
+                playerNode.ButtonX(aCON);
+            }
+        }
+
+        public virtual void ButtonY(InputAction.CallbackContext aCON)
+        {
+            if (playerNode != null)
+            {
+                playerNode.ButtonY(aCON);
+            }
+        }
+
+        
 
         // expect button callback
         public virtual void PositiveAuxButtonPress(InputAction.CallbackContext aCON)

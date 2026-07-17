@@ -63,7 +63,7 @@ namespace BugFreeProductions.Tools
         }
 
         // expext callback context
-        public virtual void FourWayInput(InputAction.CallbackContext aCON)
+        public virtual void LeftStickAndWSAD(InputAction.CallbackContext aCON)
         {
             Vector2 rVal = aCON.ReadValue<Vector2>();
             moveDir = new Vector3(rVal.x, 0, rVal.y);
@@ -72,9 +72,21 @@ namespace BugFreeProductions.Tools
 
         #region AuxButtons for extra functionality
         // expect button callback
-        public virtual void AuxButtonPress(InputAction.CallbackContext aCON)
+        public virtual void ButtonA(InputAction.CallbackContext aCON)
         {
 
+        }
+        public virtual void ButtonB(InputAction.CallbackContext aCON)
+        {
+            
+        }
+        public virtual void ButtonX(InputAction.CallbackContext aCON)
+        {
+            
+        }
+        public virtual void ButtonY(InputAction.CallbackContext aCON)
+        {
+            
         }
 
         // expect button callback
