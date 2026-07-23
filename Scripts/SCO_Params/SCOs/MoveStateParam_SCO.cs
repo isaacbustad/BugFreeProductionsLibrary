@@ -31,11 +31,10 @@ public class MoveStateParam_SCO : ScriptableObject
     [Range(0, 90)]
     protected float maxTilt = 45;
 
-    [SerializeField,Range(0,25), Header("Jump Vars")] 
-    protected float maxJumpPow = 15;
+    [SerializeField,Range(0,25), Header("Jump Vars")] protected float maxJumpPow = 15;
 
-    [SerializeField,Range(0,25)] 
-    protected float jumpMult = 15;
+    [SerializeField,Range(0,25)] protected float jumpMult = 15;
+    [SerializeField, Range(1,100)] protected float minJumpPow = 5;
 
     [SerializeField, Range(0, 1), Header("Fall Gravity Mod"), Header("As a percentage of downward velocity")]
     protected float fallSpeed = 1f;
@@ -48,6 +47,7 @@ public class MoveStateParam_SCO : ScriptableObject
     public float MaxTilt { get { return maxTilt; } }
     public float MaxJumpPow { get { return maxJumpPow; } }
     public float JumpMult { get {  return jumpMult; } }
+    public float MinJumpPow{get{return minJumpPow;}}
     public float FallSpeed { get {  return fallSpeed; } }
 
 

@@ -49,6 +49,51 @@ namespace BugFreeProductions.Extentions
 
         
 
+        
+        public static Quaternion StepRotateWithBuffer(Quaternion current, Quaternion target, float maxDegreesDelta, float bufferAngle, out bool isFinished)
+        {
+            // 1. Find the remaining angle in degrees between rotations
+            float remainingAngle = Quaternion.Angle(current, target);
+
+            // 2. Check if we are within the snap threshold
+            if (remainingAngle <= bufferAngle)
+            {
+                isFinished = true;
+                return target;
+            }
+
+            // 3. Step forward by maxDegreesDelta degrees without any lerp/slerp smoothing
+            isFinished = false;
+            return Quaternion.RotateTowards(current, target, maxDegreesDelta);
+        }
+
+        public static Quaternion CalcNewRotation(   Quaternion currentRotation, 
+                                                    Quaternion targetRotation, 
+                                                    float progressStep)
+        {
+            // 1. Calculate how far apart the two rotations are in degrees
+            float remainingAngleInDegrees = Quaternion.Angle(currentRotation, targetRotation);
+    
+            return Quaternion.Slerp(currentRotation, targetRotation, progressStep);
+        }
+
+        public static bool CalcNewRotation( Quaternion currentRotation, 
+                                            Quaternion targetRotation, 
+                                            float progressStep, 
+                                            float bufferAngleInDegrees, 
+                                            out Quaternion resultRotation)
+        {
+            // 1. Check if we are already close enough to snap
+            if (Quaternion.Angle(currentRotation, targetRotation) <= bufferAngleInDegrees)
+            {
+                resultRotation = targetRotation; // Snap to target
+                return true;                     // Rotation is finished
+            }
+
+            // 2. Otherwise, step toward the target
+            resultRotation = Quaternion.Slerp(currentRotation, targetRotation, progressStep);
+            return false;
+        }
         public static float CalcAngleViaSides(float oppSide, float oth1, float oth2)
         {
             float top = (oppSide * oppSide) - (oth1 * oth1) - (oth2 * oth2);
