@@ -5,6 +5,7 @@
 using System.Collections.Generic;
 
 using UnityEngine;
+using BugFreeProductions.Spatial;
 //using Vector3 = UnityEngine.Vector3;
 
 namespace BugFreeProductions.Tools

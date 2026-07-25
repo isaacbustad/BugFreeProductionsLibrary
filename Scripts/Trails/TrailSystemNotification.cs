@@ -2,11 +2,11 @@
 // Created      :   7/8/2026
 
 
-using BugFreeProductions.Tools;
+using BugFreeProductions.Spatial;
 using UnityEngine;
 
-namespace BugFreeProductions
-    {
+namespace BugFreeProductions.Tools
+{
     public struct TrailSystemNotification: ISubscriberNotification
     {
         public OrientationData startOrientationData;

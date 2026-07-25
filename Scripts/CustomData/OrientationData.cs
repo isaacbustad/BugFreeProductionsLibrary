@@ -10,7 +10,7 @@ using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
 
 
-namespace BugFreeProductions.Tools
+namespace BugFreeProductions.Spatial
 {
     public enum OrientationDirection
     {
@@ -44,29 +44,39 @@ namespace BugFreeProductions.Tools
         /// <returns>The direction vector.</returns>
         public Vector3 Direction(OrientationDirection aDirection)
         {
+            // hold the calculated direction result
             Vector3 direction = Vector3.zero;
+
             switch (aDirection)
             {
                 case OrientationDirection.forward:
                     direction = rotationData * Vector3.forward;
                     break;
+
                 case OrientationDirection.backward:
                     direction = rotationData * -Vector3.forward;
                     break;
+
                 case OrientationDirection.left:
                     direction = rotationData * -Vector3.right;
                     break;
+
                 case OrientationDirection.right:
                     direction = rotationData * Vector3.right;
                     break;
+
                 case OrientationDirection.up:
                     direction = rotationData * Vector3.up;
                     break;
+
                 case OrientationDirection.down:
                     direction = rotationData * -Vector3.up;
                     break;
+
             }
+
             return direction;
+
         }
 
         /// <summary>

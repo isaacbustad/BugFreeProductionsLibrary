@@ -21,6 +21,7 @@ namespace BugFreeProductions.Tools
         protected bool isPlayerCharacter = false;
 
         // stored input value
+        protected Vector2 lsWSADinput = Vector2.zero;
         protected Vector3 moveDir = Vector3.zero;
 
         // player context references
@@ -65,7 +66,12 @@ namespace BugFreeProductions.Tools
         // expext callback context
         public virtual void LeftStickAndWSAD(InputAction.CallbackContext aCON)
         {
+            // read the value in
             Vector2 rVal = aCON.ReadValue<Vector2>();
+
+            // store the value
+            lsWSADinput = rVal;
+
             moveDir = new Vector3(rVal.x, 0, rVal.y);
         }
         #endregion
@@ -128,10 +134,12 @@ namespace BugFreeProductions.Tools
 
         #endregion Methods
 
-        // Accessors
+        #region Accessors
         public virtual bool IsPlayerCharacter {  set { isPlayerCharacter = value; ChangeIsPlayerCharacter(value); } }
         public virtual Camera NodeCamera { get { return nodeCamera; } }
         public virtual Vector3 MovDir { get { return moveDir; } }
+
+        public virtual Vector2 LSwsadInput {get{return lsWSADinput;}}
 
         public virtual SinglePlayerInputCollector SinglePlayerInputCollector { get { return singlePlayerInputCollector; } set { singlePlayerInputCollector = value; } }
         
@@ -146,5 +154,9 @@ namespace BugFreeProductions.Tools
                 return gameModeNode; 
             } 
         }
+
+        #endregion Accessors
     }
+
+    
 }
