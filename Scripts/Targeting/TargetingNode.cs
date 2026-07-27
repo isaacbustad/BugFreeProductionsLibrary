@@ -3,6 +3,7 @@
 
 
 using System.Collections.Generic;
+using BugFreeProductions.Spatial;
 using UnityEngine;
 
 namespace BugFreeProductions.Tools
@@ -12,6 +13,7 @@ namespace BugFreeProductions.Tools
         #region Vars
         [SerializeField] protected TargetNode targetNode = null;
         [SerializeField] protected TargetingSystemParams_SCO targetingSystemParams_SCO = null;
+        [SerializeField] protected Clock_SCO clock_SCO;
         
 
         #endregion Vars
@@ -20,13 +22,37 @@ namespace BugFreeProductions.Tools
         #region Methods
 
         #region Unity Methods
+        protected virtual void OnEnable()
+        {
+            Setup();
+        }
 
         #endregion Unity Methods
         
+        protected virtual void Setup()
+        {
+            TargetingSystem.Instance.Subscribe(this);
+
+            // setup the clock
+            if (clock_SCO != null )
+            {
+                clock_SCO.Subscribe(this);
+            }
+        }
+
         #region Implement ISubscriber
         public void OnNotify(ISubscriberNotification aSubMessage)
         {
+            if (aSubMessage is ClockNotification clockNotification)
+            {
+                TargetingSystem.Instance.FindTargets(   
+                                                        targetNode,
+                                                        targetingSystemParams_SCO,
+                                                        new OrientationData(transform.position,transform.rotation)
+                                                    );
 
+                                                    
+            }
         }
 
         // adds Subscriber to subscription
@@ -64,6 +90,12 @@ namespace BugFreeProductions.Tools
         {
             get
             {
+                // if the field is empty add the component and assign
+                if (targetNode == null)
+                {
+                    targetNode = gameObject.AddComponent<TargetNode>();
+                }
+
                 return targetNode;
             }
         }

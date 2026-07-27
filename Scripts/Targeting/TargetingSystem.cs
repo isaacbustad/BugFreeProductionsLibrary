@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace BugFreeProductions.Tools
 {
-    public class TargetingSystem : GenericSingleton<TargetingSystem>
+    public class TargetingSystem : GenericSingleton<TargetingSystem>, ISubscription
     {
         #region Vars
         protected List<TargetNode> targetNodes = new List<TargetNode>();
@@ -24,7 +24,7 @@ namespace BugFreeProductions.Tools
 
         #region Methods
         #region Unity Methods
-        public virtual List<TargetData> FindTarget( TargetNode ignoreNode, 
+        public virtual List<TargetData> FindTargets( TargetNode ignoreNode, 
                                                     TargetingSystemParams_SCO targetingSystemParams_SCO, 
                                                     OrientationData aOrientationData)
         {
@@ -36,15 +36,13 @@ namespace BugFreeProductions.Tools
                                                                 targetingSystemParams_SCO.TargetingInterval,
                                                                 aOrientationData);
             
+            // get refference to a filtered list
+            List<TargetNode> validTargets = ValidTargetNodes(aOrientationData, ignoreNode, targetingSystemParams_SCO);
+            
             // loop through each point for each possible target
-            foreach (TargetNode tn in targetNodes)
+            foreach (TargetNode tn in validTargets)
             {                
-                if (tn.GetInstanceID() != ignoreNode.GetInstanceID())
-                {
-                    // create a Targetdata Node list 
-                    // select the one with the minimum distance
-                    //CalculateClosestToPath(targetingPath,tn);
-                }
+                targetingData.Add(CalculateClosestToPath(targetingPath, tn));
             }
 
             return targetingData;
@@ -71,6 +69,7 @@ namespace BugFreeProductions.Tools
                                             (aOrientationData.Direction(OrientationDirection.forward) * intervalStep);
 
                 // add the calculated point to the path
+                targetingPath.Add(ofsetAtInterval);
 
 
                 // increment to calculation
@@ -83,45 +82,85 @@ namespace BugFreeProductions.Tools
         }
 
 
-        // protected virtual TargetData CalculateClosestToPath(List<Vector3> aTargPath, TargetNode aTargetNode)
-        // {
-        //     // calculate distance to all path nodes
-        // }
+        // Only call if list is populated
+        protected virtual TargetData CalculateClosestToPath(List<Vector3> aTargetPath, TargetNode aTargetNode)
+        {
+            // hold minimum distance
+            float minDistance = Vector3.Distance(aTargetPath[0],aTargetNode.transform.position);
 
-        protected virtual List<TargetNode> FilterTargetNodes(List<TargetNode> aTargetNodes)
+            // calculate distance to all path nodes
+            foreach (Vector3 v3 in aTargetPath)
+            {
+                float aDistance = Vector3.Distance(v3, aTargetNode.transform.position);
+
+                if (aDistance < minDistance)
+                {
+                    minDistance = aDistance;
+                }
+            }
+
+            // construct response
+            TargetData response = new TargetData(aTargetNode, minDistance);
+            return response;
+        }
+
+        protected virtual List<TargetNode> ValidTargetNodes(OrientationData aOD, 
+                                                                TargetNode ignoreNode, 
+                                                                TargetingSystemParams_SCO targetingSystemParams_SCO)
         {
             // store list of valid targets
             List<TargetNode> validTargets = new List<TargetNode>();
 
-            //BugFreeTool
+
+            // loop through and add valid targets to a list
+            foreach (TargetNode tn in targetNodes)
+            {
+                // ignore specified Node
+                if (tn.GetInstanceID() != ignoreNode.GetInstanceID())
+                {
+                    // calculate the angle between the orientation and target
+                    //float angleToTarget = OrientationExtension.CalculateAngleToTarget(aOD,tn.transform.position);
+                    float angleToTarget = aOD.AngleToTarget(tn.transform.position);
+
+                    if (angleToTarget < targetingSystemParams_SCO.TargetingAngle / 2 &&
+                        Vector3.Distance(aOD.positionData,tn.transform.position) < targetingSystemParams_SCO.TargetingRange)
+                    {
+                        
+                    }
+
+                }
+
+            }
+
+            
             return validTargets;
         }
 
         #endregion Targeting Methods
 
 
-        // #region Implement ISubscription
-        // public void Subscribe(ISubscriber subscriber)
-        // {
-        //     if(subscriber is TargetingNode aTargetingNode)
-        //     {
-        //         targetNodes.Add(aTargetingNode.TargetNode);
-        //     }
+        #region Implement ISubscription
+        public void Subscribe(ISubscriber subscriber)
+        {
+            if(subscriber is TargetingNode aTargetingNode)
+            {
+                targetNodes.Add(aTargetingNode.TargetNode);
+            }
 
-        // }
+        }
 
-        // public void UnSubscribe(ISubscriber subscriber)
-        // {
-        //     if(subscriber is TargetingNode aTargetingNode)
-        //     {
-        //         targetNodes.Remove(aTargetingNode.TargetNode);
-        //     }
-        // }
-        // public void Notify()
-        // {
+        public void UnSubscribe(ISubscriber subscriber)
+        {
+            if(subscriber is TargetingNode aTargetingNode)
+            {
+                targetNodes.Remove(aTargetingNode.TargetNode);
+            }
+        }
+        public void Notify()
+        {
 
-        // }
-        // #endregion Implement ISubscription
+        }
+        #endregion Implement ISubscription
 
         #endregion Methods
 

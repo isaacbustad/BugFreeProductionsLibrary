@@ -13,8 +13,9 @@ namespace BugFreeProductions
     public class TargetingSystemParams_SCO : ScriptableObject
     {
         #region Vars
-        protected float targetingRange;
-        protected float targetingInterval;
+        protected float targetingRange = 3f;
+        protected float targetingInterval = 1;
+        protected float targetingAngle = 45f;
 
         #endregion Vars
 
@@ -40,6 +41,14 @@ namespace BugFreeProductions
             get
             {
                 return targetingInterval;
+            }
+        }
+
+        public float TargetingAngle
+        {
+            get
+            {
+                return targetingAngle;
             }
         }
 
