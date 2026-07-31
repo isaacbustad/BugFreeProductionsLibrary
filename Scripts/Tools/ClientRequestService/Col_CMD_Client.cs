@@ -36,7 +36,15 @@ namespace BugFreeProductions.Tools
         // occures on collision
         protected virtual void OnCollisionEnter(Collision aCollision)
         {
+            //Request(aCollision.gameObject);
+            ColRequest(aCollision);
+        }
+
+        protected virtual void ColRequest(Collision aCollision)
+        {
             Request(aCollision.gameObject);
+            //Debug.Log(aCollision.gameObject.name);
+            //Debug.Log("" + (aCollision.gameObject.GetComponent<CMD_Service>() != null));
         }
 
 
