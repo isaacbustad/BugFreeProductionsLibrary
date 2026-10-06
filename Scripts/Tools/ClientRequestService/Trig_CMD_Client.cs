@@ -26,6 +26,11 @@ namespace BugFreeProductions.Tools
             
         }
 
+        protected virtual void OnTriggerStay(Collider other)
+        {
+            
+        }
+
         protected virtual void TrigRequest(Collider other)
         {
             //other.attachedRigidbody.gameObject.name = "here is collision";
