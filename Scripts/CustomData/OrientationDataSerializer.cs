@@ -72,8 +72,10 @@ namespace BugFreeProductions.Spatial
             return data;
         }
 
-        public static Vector3 DeserializePosition(OrientationDataPacket packet)
+        public static Vector3 DeserializePosition(byte[] buffer)
         {
+            OrientationDataPacket packet = Deserialize(buffer);
+
             // Reconstruct the Vector3 delta using the scale factor (e.g., 1000f)
             float scaleFactor = 1000f;
             
@@ -87,8 +89,10 @@ namespace BugFreeProductions.Spatial
         }
 
 
-        public static OrientationData DeserializeOrientation(OrientationDataPacket packet)
+        public static OrientationData DeserializeOrientation(byte[] buffer)
         {
+            OrientationDataPacket packet = Deserialize(buffer);
+
             // Reconstruct the Vector3 delta using the scale factor (e.g., 1000f)
             float scaleFactor = 1000f;
             
