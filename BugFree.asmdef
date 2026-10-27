@@ -1,0 +1,8 @@
+{
+  "name": "BugFree.Core",
+  "references": [
+    "Unity.InputSystem"
+  ],
+  "autoReferenced": true,
+  "noEngineReferences": false
+}
