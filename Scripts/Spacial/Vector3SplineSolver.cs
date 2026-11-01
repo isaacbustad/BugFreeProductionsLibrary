@@ -17,15 +17,16 @@ namespace BugFreeProductions.Spatial
         public Vector3 P1;
         public Vector3 P2;
         public Vector3 P3;
+        public float Duration; 
 
 
-        public Vector3SplineSnapshot(Vector3 aStartPosition, Vector3 aStartVelocity, Vector3 aEndPosition, Vector3 aEndVelocity)
+        public Vector3SplineSnapshot(Vector3 aStartPosition, Vector3 aStartVelocity, Vector3 aEndPosition, Vector3 aEndVelocity, float aDuration)
         {
             P0 = aStartPosition;
             P1 = aStartPosition + aStartVelocity;
             P2 = aEndPosition - aEndVelocity;
             P3 = aEndPosition;
-
+            Duration = aDuration;
         }
     }
 
