@@ -101,12 +101,8 @@ namespace BugFreeProductions.Spatial
             // 1. If active snapshot is null and list has items, grab the next one from the front (FIFO)
             if (!activeSnapshot.HasValue && snapshotList.Count > 0)
             {
-                // .First gets the first node in the list, and .Value gets its data payload
                 activeSnapshot = snapshotList.First.Value;
-                
-                // Remove it from the list since it is now our active playing snapshot
                 snapshotList.RemoveFirst();
-                
                 elapsedSnapshotTime = 0f;
             }
 
@@ -116,23 +112,21 @@ namespace BugFreeProductions.Spatial
                 elapsedSnapshotTime += Time.deltaTime;
                 float duration = activeSnapshot.Value.Duration;
                 
-                // Prevent division by zero if duration is somehow 0 or negative
-                // Ternary layout: (condition ? true_result : false_result)
                 float normalizedAlpha = duration > 0f ? Mathf.Clamp01(elapsedSnapshotTime / duration) : 1.0f;
 
-                // Evaluate position using the stateless solver
                 transform.position = Vector3SplineSolver.Evaluate(activeSnapshot.Value, normalizedAlpha);
 
-                // Once this snapshot's specific time window finishes, clear it so the next one can start
                 if (normalizedAlpha >= 1.0f)
                 {
                     activeSnapshot = null;
                 }
             }
-            // 3. Fallback chasing if the queue starves (no network snapshots available)
+            // 3. Fallback: When the buffer is empty (idle/resting state), track the physical body directly
             else
             {
-                transform.position = Vector3.Lerp(transform.position, physicalBodyTarget.position, Time.deltaTime * 20f);
+                // Snap or gently catch up to the physical target so visuals don't freeze
+                transform.position = physicalBodyTarget.position;
+                lastTargetVelocity = Vector3.zero; // Reset velocity tracking during idle rest
             }
         }
 
