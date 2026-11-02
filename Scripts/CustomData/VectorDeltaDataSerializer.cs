@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace BugFreeProductions.Spatial
 {
-    public struct OrientationDataPacket
+    public struct VectorDeltaDataPacket
     {
         public short qx;
         public short qy;
@@ -14,14 +14,17 @@ namespace BugFreeProductions.Spatial
         public byte mask;
     }
 
-    public static class OrientationDataSerializer
+    public static class VectorDeltaDataSerializer
     {
+
+        #region Vector
         private const int PayloadSize = 7;
+
 
         /// <summary>
         /// Evaluates the delta and serializes into a compact 7-byte array.
         /// </summary>
-        public static byte[] Serialize(Vector3 delta, float threshold, float scaleFactor = 1000f)
+        public static byte[] SerializeDeltaVector(Vector3 delta, float threshold, float scaleFactor = 1000f)
         {
             // Check if ANY axis exceeds the threshold. If not, don't allocate or send anything!
             bool exceedsThreshold = Mathf.Abs(delta.x) >= threshold || 
@@ -51,14 +54,14 @@ namespace BugFreeProductions.Spatial
         /// <summary>
         /// Deserializes a 7-byte array back into an OrientationDataPacket.
         /// </summary>
-        public static OrientationDataPacket Deserialize(byte[] buffer)
+        public static VectorDeltaDataPacket DeserializeDeltaVector(byte[] buffer)
         {
             if (buffer == null || buffer.Length < PayloadSize)
             {
                 throw new ArgumentException($"Buffer is too small to deserialize OrientationDataPacket. Expected {PayloadSize} bytes.");
             }
 
-            OrientationDataPacket data = new OrientationDataPacket();
+            VectorDeltaDataPacket data = new VectorDeltaDataPacket();
             int offset = 0;
 
             data.qx = BitConverter.ToInt16(buffer, offset);
@@ -72,9 +75,9 @@ namespace BugFreeProductions.Spatial
             return data;
         }
 
-        public static Vector3 DeserializePosition(byte[] buffer)
+        public static Vector3 DeserializeDeltaPosition(byte[] buffer)
         {
-            OrientationDataPacket packet = Deserialize(buffer);
+            VectorDeltaDataPacket packet = DeserializeDeltaVector(buffer);
 
             // Reconstruct the Vector3 delta using the scale factor (e.g., 1000f)
             float scaleFactor = 1000f;
@@ -87,11 +90,11 @@ namespace BugFreeProductions.Spatial
             // Create new vector 3
             return new Vector3 (dx, dy, dz); 
         }
-
+        #endregion Vector
 
         public static OrientationData DeserializeOrientation(byte[] buffer)
         {
-            OrientationDataPacket packet = Deserialize(buffer);
+            VectorDeltaDataPacket packet = DeserializeDeltaVector(buffer);
 
             // Reconstruct the Vector3 delta using the scale factor (e.g., 1000f)
             float scaleFactor = 1000f;
