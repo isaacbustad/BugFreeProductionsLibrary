@@ -16,8 +16,8 @@ namespace BugFreeProductions.Spatial
         [SerializeField] private float defaultTickDuration = 0.05f; 
 
         [Header("Stationary Filtering")]
-        [SerializeField, Tooltip("Deadzone threshold to filter out sub-millimeter physics solver noise when held still.")]
-        private float stationaryThreshold = 0.0005f;
+        [SerializeField, Tooltip("Threshold to filter out sub-millimeter physics noise from entering the snapshot queue.")]
+        private float noiseTolerance = 0.001f; // 1 millimeter tolerance
 
         // FIFO queue matching the VisualSplineUpdater pattern
         private LinkedList<OrientationSnapshot> snapshotBuffer = new LinkedList<OrientationSnapshot>();
@@ -57,18 +57,16 @@ namespace BugFreeProductions.Spatial
         /// </summary>
         public void PushOrientationState(OrientationData targetState, Vector3 targetVelocity, float customDuration = -1f)
         {
-            // FIX: If the new target matches the last queued snapshot and velocity is zero, 
-            // skip adding a redundant segment to prevent spline micro-stutter.
-            if (snapshotBuffer.Last != null)
-            {
-                OrientationData lastEndState = snapshotBuffer.Last.Value.endState;
-                bool isSamePosition = (lastEndState.positionData - targetState.positionData).sqrMagnitude < 0.00001f;
-                bool isSameRotation = Quaternion.Angle(lastEndState.rotationData, targetState.rotationData) < 0.01f;
+            // ROBUST NOISE FILTER: Compare against the tail of the queue (or current transform if buffer is empty)
+            OrientationData referenceState = snapshotBuffer.Last != null ? snapshotBuffer.Last.Value.endState : new OrientationData(lastStablePosition, lastStableRotation);
 
-                if (isSamePosition && isSameRotation && targetVelocity.sqrMagnitude < 0.0001f)
-                {
-                    return; // Discard redundant duplicate packet
-                }
+            float posDeltaSq = (referenceState.positionData - targetState.positionData).sqrMagnitude;
+            float angleDelta = Quaternion.Angle(referenceState.rotationData, targetState.rotationData);
+
+            // If the incoming state is within the noise threshold and velocity is near zero, discard it entirely!
+            if (posDeltaSq < (noiseTolerance * noiseTolerance) && angleDelta < 0.5f && targetVelocity.sqrMagnitude < 0.001f)
+            {
+                return; 
             }
 
             OrientationData startState;
@@ -115,7 +113,7 @@ namespace BugFreeProductions.Spatial
                 activeSnapshot = snapshotBuffer.First.Value;
                 snapshotBuffer.RemoveFirst();
                 elapsedSnapshotTime = 0f;
-                isLatched = false; // Unlatch when a new movement segment starts
+                isLatched = false;
             }
 
             // 2. Evaluate active snapshot using smooth spline (position) and slerp (rotation)
@@ -127,13 +125,9 @@ namespace BugFreeProductions.Spatial
                 
                 float normalizedAlpha = duration > 0f ? Mathf.Clamp01(elapsedSnapshotTime / duration) : 1.0f;
 
-                // Evaluate Position via Vector3SplineSolver
                 Vector3 interpolatedPosition = EvaluatePosition(activeSnapshot.Value, normalizedAlpha);
-                
-                // Evaluate Rotation via ShortestPathSlerp
                 Quaternion interpolatedRotation = EvaluateRotation(activeSnapshot.Value, normalizedAlpha);
 
-                // If we hit or exceed the end of the snapshot, snap cleanly to avoid overshoots
                 if (normalizedAlpha >= 1.0f)
                 {
                     interpolatedPosition = activeSnapshot.Value.endState.positionData;
@@ -147,13 +141,13 @@ namespace BugFreeProductions.Spatial
                 lastStablePosition = interpolatedPosition;
                 lastStableRotation = interpolatedRotation;
             }
-            // 3. Fallback: When buffer is empty, apply stationary deadzone latch to ignore PhysX solver noise
+            // 3. Fallback: When buffer is empty, apply stationary deadzone latch against PhysX noise
             else
             {
                 float sqrDist = (physicalBodyTarget.position - lastStablePosition).sqrMagnitude;
-                float angleDiff = Quaternion.Angle(transform.rotation, physicalBodyTarget.rotation);
+                float angleDiff = Quaternion.Angle(lastStableRotation, physicalBodyTarget.rotation);
 
-                if (sqrDist > stationaryThreshold * stationaryThreshold || angleDiff > 0.1f || !isLatched)
+                if (sqrDist > (noiseTolerance * noiseTolerance) || angleDiff > 0.5f || !isLatched)
                 {
                     transform.position = physicalBodyTarget.position;
                     transform.rotation = physicalBodyTarget.rotation;
@@ -164,7 +158,6 @@ namespace BugFreeProductions.Spatial
                 }
                 else
                 {
-                    // Lock transform completely still against micro-wiggles
                     transform.position = lastStablePosition;
                     transform.rotation = lastStableRotation;
                 }
