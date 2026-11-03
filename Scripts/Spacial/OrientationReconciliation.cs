@@ -19,6 +19,9 @@ namespace BugFreeProductions.Spatial
         [SerializeField, Tooltip("Threshold to filter out sub-millimeter physics noise from entering the snapshot queue.")]
         private float noiseTolerance = 0.001f; // 1 millimeter tolerance
 
+        [SerializeField, Tooltip("Smoothing damping factor when settling into idle position.")]
+        private float idleDamping = 25f;
+
         // FIFO queue matching the VisualSplineUpdater pattern
         private LinkedList<OrientationSnapshot> snapshotBuffer = new LinkedList<OrientationSnapshot>();
         
@@ -27,11 +30,6 @@ namespace BugFreeProductions.Spatial
 
         // Track velocities to maintain C^1 continuity across segments
         private Vector3 lastTargetVelocity = Vector3.zero;
-
-        // Latch fields to eliminate stationary physics jitter
-        private Vector3 lastStablePosition;
-        private Quaternion lastStableRotation;
-        private bool isLatched = false;
 
         private void Awake()
         {
@@ -47,8 +45,6 @@ namespace BugFreeProductions.Spatial
             {
                 transform.position = physicalBodyTarget.position;
                 transform.rotation = physicalBodyTarget.rotation;
-                lastStablePosition = transform.position;
-                lastStableRotation = transform.rotation;
             }
         }
 
@@ -57,8 +53,8 @@ namespace BugFreeProductions.Spatial
         /// </summary>
         public void PushOrientationState(OrientationData targetState, Vector3 targetVelocity, float customDuration = -1f)
         {
-            // ROBUST NOISE FILTER: Compare against the tail of the queue (or current transform if buffer is empty)
-            OrientationData referenceState = snapshotBuffer.Last != null ? snapshotBuffer.Last.Value.endState : new OrientationData(lastStablePosition, lastStableRotation);
+            // ROBUST NOISE FILTER: Compare against the tail of the queue or current transform/start
+            OrientationData referenceState = snapshotBuffer.Last != null ? snapshotBuffer.Last.Value.endState : new OrientationData(transform.position, transform.rotation);
 
             float posDeltaSq = (referenceState.positionData - targetState.positionData).sqrMagnitude;
             float angleDelta = Quaternion.Angle(referenceState.rotationData, targetState.rotationData);
@@ -113,13 +109,11 @@ namespace BugFreeProductions.Spatial
                 activeSnapshot = snapshotBuffer.First.Value;
                 snapshotBuffer.RemoveFirst();
                 elapsedSnapshotTime = 0f;
-                isLatched = false;
             }
 
             // 2. Evaluate active snapshot using smooth spline (position) and slerp (rotation)
             if (activeSnapshot.HasValue)
             {
-                isLatched = false;
                 elapsedSnapshotTime += Time.fixedDeltaTime;
                 float duration = activeSnapshot.Value.Duration;
                 
@@ -137,30 +131,14 @@ namespace BugFreeProductions.Spatial
 
                 transform.position = interpolatedPosition;
                 transform.rotation = interpolatedRotation;
-
-                lastStablePosition = interpolatedPosition;
-                lastStableRotation = interpolatedRotation;
             }
-            // 3. Fallback: When buffer is empty, apply stationary deadzone latch against PhysX noise
+            // 3. Fallback: Smooth exponential decay toward physical target to eliminate solver noise without snapping
             else
             {
-                float sqrDist = (physicalBodyTarget.position - lastStablePosition).sqrMagnitude;
-                float angleDiff = Quaternion.Angle(lastStableRotation, physicalBodyTarget.rotation);
+                float blendFactor = 1f - Mathf.Exp(-idleDamping * Time.fixedDeltaTime);
 
-                if (sqrDist > (noiseTolerance * noiseTolerance) || angleDiff > 0.5f || !isLatched)
-                {
-                    transform.position = physicalBodyTarget.position;
-                    transform.rotation = physicalBodyTarget.rotation;
-
-                    lastStablePosition = transform.position;
-                    lastStableRotation = transform.rotation;
-                    isLatched = true;
-                }
-                else
-                {
-                    transform.position = lastStablePosition;
-                    transform.rotation = lastStableRotation;
-                }
+                transform.position = Vector3.Lerp(transform.position, physicalBodyTarget.position, blendFactor);
+                transform.rotation = Quaternion.Slerp(transform.rotation, physicalBodyTarget.rotation, blendFactor);
 
                 lastTargetVelocity = Vector3.zero;
             }
@@ -172,29 +150,4 @@ namespace BugFreeProductions.Spatial
             activeSnapshot = null;
             elapsedSnapshotTime = 0f;
             lastTargetVelocity = Vector3.zero;
-            isLatched = false;
         }
-
-        private Vector3 EvaluatePosition(OrientationSnapshot snapshot, float t)
-        {
-            Vector3SplineSnapshot splineSnapshot = new Vector3SplineSnapshot(
-                snapshot.startState.positionData,
-                snapshot.startVelocity,
-                snapshot.endState.positionData,
-                snapshot.endVelocity,
-                snapshot.Duration
-            );
-
-            return Vector3SplineSolver.Evaluate(splineSnapshot, t);
-        }
-
-        private Quaternion EvaluateRotation(OrientationSnapshot snapshot, float t)
-        {
-            return RotationReconciliation.ShortestPathSlerp(
-                snapshot.startState.rotationData,
-                snapshot.endState.rotationData,
-                Mathf.Clamp01(t)
-            );
-        }
-    }
-}
