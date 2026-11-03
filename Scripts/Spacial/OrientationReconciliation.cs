@@ -151,3 +151,27 @@ namespace BugFreeProductions.Spatial
             elapsedSnapshotTime = 0f;
             lastTargetVelocity = Vector3.zero;
         }
+
+        private Vector3 EvaluatePosition(OrientationSnapshot snapshot, float t)
+        {
+            Vector3SplineSnapshot splineSnapshot = new Vector3SplineSnapshot(
+                snapshot.startState.positionData,
+                snapshot.startVelocity,
+                snapshot.endState.positionData,
+                snapshot.endVelocity,
+                snapshot.Duration
+            );
+
+            return Vector3SplineSolver.Evaluate(splineSnapshot, t);
+        }
+
+        private Quaternion EvaluateRotation(OrientationSnapshot snapshot, float t)
+        {
+            return RotationReconciliation.ShortestPathSlerp(
+                snapshot.startState.rotationData,
+                snapshot.endState.rotationData,
+                Mathf.Clamp01(t)
+            );
+        }
+    }
+}
