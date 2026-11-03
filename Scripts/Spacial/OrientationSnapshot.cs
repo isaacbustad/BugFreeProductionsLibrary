@@ -28,7 +28,8 @@ namespace BugFreeProductions.Spatial
             startVelocity = aStartVelocity;
             endVelocity = aEndVelocity;
             startTime = aStartTime;
-            endTime = aEndTime;
+            // Ensure endTime can never precede or match startTime
+            endTime = Mathf.Max(aEndTime, startTime + 0.01f);
         }
 
         public float Duration => endTime - startTime;

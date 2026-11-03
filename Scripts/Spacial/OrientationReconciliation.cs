@@ -1,162 +1,174 @@
 // Created By   :   Isaac Bustad
-// Created      :   10/6/2026
+// Created      :   11/2/2026
 
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace BugFreeProductions.Spatial
 {
-    /// <summary>
-    /// Manages the snapshot interpolation buffer, coordinates position splines, 
-    /// and updates the transform position and rotation in LateUpdate.
-    /// </summary>
     public class OrientationReconciliation : MonoBehaviour
     {
-        #region Fields
-        [Header("Configuration")]
-        [SerializeField, Tooltip("Maximum number of snapshots to keep in the buffer.")]
-        private int maxBufferSize = 20;
+        [Header("Target Tracking")]
+        [SerializeField, Tooltip("The physical root transform this visual object follows.")]
+        private Transform physicalBodyTarget;
+        
+        [Header("Default Timing")]
+        [SerializeField] private float defaultTickDuration = 0.05f; 
 
-        [SerializeField, Tooltip("Interpolation delay buffer time in seconds to absorb network jitter.")]
-        private float interpolationDelay = 0.1f;
+        // FIFO queue matching the VisualSplineUpdater pattern
+        private LinkedList<OrientationSnapshot> snapshotBuffer = new LinkedList<OrientationSnapshot>();
+        
+        private OrientationSnapshot? activeSnapshot;
+        private float elapsedSnapshotTime;
 
-        [SerializeField, Tooltip("Target transform to apply the interpolated orientation to. Defaults to this transform.")]
-        private Transform targetTransform;
+        // Track velocities to maintain C^1 continuity across segments
+        private Vector3 lastTargetVelocity = Vector3.zero;
 
-        private LinkedList<OrientationSnapshot> snapshotBuffer;
-        #endregion Fields
-
-        #region Unity Lifecycle
         private void Awake()
         {
-            snapshotBuffer = new LinkedList<OrientationSnapshot>();
-
-            if (targetTransform == null)
+            if (physicalBodyTarget == null)
             {
-                targetTransform = transform;
+                physicalBodyTarget = transform.root;
             }
         }
 
-        private void LateUpdate()
+        private void Start()
         {
-            // Automatically drive interpolation every frame using local time
-            if (Evaluate(Time.time, out OrientationData result))
+            if (physicalBodyTarget != null)
             {
-                targetTransform.position = result.positionData;
-                targetTransform.rotation = result.rotationData;
+                transform.position = physicalBodyTarget.position;
+                transform.rotation = physicalBodyTarget.rotation;
             }
         }
-        #endregion Unity Lifecycle
 
-        #region Methods
         /// <summary>
-        /// Adds a new orientation snapshot to the interpolation buffer, enforcing capacity limits.
+        /// Pushes a new absolute orientation state into the smoothing buffer.
         /// </summary>
-        public void AddSnapshot(OrientationSnapshot snapshot)
+        public void PushOrientationState(OrientationData targetState, Vector3 targetVelocity, float customDuration = -1f)
         {
+            // FIX: If the new target matches the last queued snapshot and velocity is zero, 
+            // skip adding a redundant segment to prevent spline micro-stutter.
+            if (snapshotBuffer.Last != null)
+            {
+                OrientationData lastEndState = snapshotBuffer.Last.Value.endState;
+                bool isSamePosition = (lastEndState.positionData - targetState.positionData).sqrMagnitude < 0.00001f;
+                bool isSameRotation = Quaternion.Angle(lastEndState.rotationData, targetState.rotationData) < 0.01f;
+
+                if (isSamePosition && isSameRotation && targetVelocity.sqrMagnitude < 0.0001f)
+                {
+                    return; // Discard redundant duplicate packet
+                }
+            }
+
+            
+            OrientationData startState;
+            Vector3 startVelocity = lastTargetVelocity;
+
+            // Chain smoothly from the tail of the queue, active snapshot, or current visual position
+            if (snapshotBuffer.Last != null)
+            {
+                startState = snapshotBuffer.Last.Value.endState;
+            }
+            else if (activeSnapshot.HasValue)
+            {
+                startState = activeSnapshot.Value.endState;
+            }
+            else
+            {
+                startState = new OrientationData(transform.position, transform.rotation);
+            }
+
+            float segmentDuration = customDuration > 0f ? customDuration : defaultTickDuration;
+            float currentTime = Time.time;
+            float endTime = currentTime + segmentDuration;
+
+            OrientationSnapshot snapshot = new OrientationSnapshot(
+                startState,
+                targetState,
+                startVelocity,
+                targetVelocity,
+                currentTime,
+                endTime
+            );
+
             snapshotBuffer.AddLast(snapshot);
+            lastTargetVelocity = targetVelocity;
+        }
 
-            if (snapshotBuffer.Count > maxBufferSize)
+        private void FixedUpdate()
+        {
+            if (physicalBodyTarget == null) return;
+
+            // 1. Grab next snapshot from the FIFO queue if none is active
+            if (!activeSnapshot.HasValue && snapshotBuffer.Count > 0)
             {
+                activeSnapshot = snapshotBuffer.First.Value;
                 snapshotBuffer.RemoveFirst();
+                elapsedSnapshotTime = 0f;
+            }
+
+            // 2. Evaluate active snapshot using smooth spline (position) and slerp (rotation)
+            if (activeSnapshot.HasValue)
+            {
+                elapsedSnapshotTime += Time.fixedDeltaTime;
+                float duration = activeSnapshot.Value.Duration;
+                
+                float normalizedAlpha = duration > 0f ? Mathf.Clamp01(elapsedSnapshotTime / duration) : 1.0f;
+
+                // Evaluate Position via Vector3SplineSolver
+                Vector3 interpolatedPosition = EvaluatePosition(activeSnapshot.Value, normalizedAlpha);
+                
+                // Evaluate Rotation via ShortestPathSlerp
+                Quaternion interpolatedRotation = EvaluateRotation(activeSnapshot.Value, normalizedAlpha);
+
+                // If we hit or exceed the end of the snapshot, snap cleanly to avoid overshoots
+                if (normalizedAlpha >= 1.0f)
+                {
+                    interpolatedPosition = activeSnapshot.Value.endState.positionData;
+                    interpolatedRotation = activeSnapshot.Value.endState.rotationData;
+                    activeSnapshot = null;
+                }
+
+                transform.position = interpolatedPosition;
+                transform.rotation = interpolatedRotation;
+            }
+            // 3. Fallback: When buffer is empty, track the physical body directly without micro-lerp friction
+            else
+            {
+                transform.position = physicalBodyTarget.position;
+                transform.rotation = physicalBodyTarget.rotation;
+                lastTargetVelocity = Vector3.zero;
             }
         }
 
-        /// <summary>
-        /// Clears all stored snapshots from the buffer.
-        /// </summary>
         public void Clear()
         {
             snapshotBuffer.Clear();
+            activeSnapshot = null;
+            elapsedSnapshotTime = 0f;
+            lastTargetVelocity = Vector3.zero;
         }
 
-        /// <summary>
-        /// Evaluates the interpolated orientation state at the given render time.
-        /// </summary>
-        public bool Evaluate(float currentTime, out OrientationData result)
-        {
-            result = default(OrientationData);
-
-            if (snapshotBuffer.Count < 2)
-            {
-                if (snapshotBuffer.Count == 1)
-                {
-                    result = snapshotBuffer.First.Value.endState;
-                    return true;
-                }
-                return false;
-            }
-
-            float targetTime = currentTime - interpolationDelay;
-
-            // Safely prune snapshots that are older than our target window, ensuring we keep at least 2
-            while (snapshotBuffer.Count > 2 && snapshotBuffer.First.Next.Value.endTime < targetTime)
-            {
-                snapshotBuffer.RemoveFirst();
-            }
-
-            OrientationSnapshot currentSnapshot = snapshotBuffer.First.Value;
-            OrientationSnapshot nextSnapshot = snapshotBuffer.First.Next.Value;
-
-            // If target time is behind the current snapshot, clamp to start
-            if (targetTime <= currentSnapshot.startTime)
-            {
-                result = currentSnapshot.startState;
-                return true;
-            }
-
-            // If target time is ahead of the next snapshot, use the next snapshot's start/end safely instead of clamping out
-            if (targetTime >= nextSnapshot.endTime)
-            {
-                result = nextSnapshot.endState;
-                return true;
-            }
-
-            // Calculate duration and normalized time (t)
-            float duration = nextSnapshot.endTime - currentSnapshot.startTime;
-            if (duration <= 0.0001f)
-            {
-                result = nextSnapshot.startState;
-                return true;
-            }
-
-            float t = (targetTime - currentSnapshot.startTime) / duration;
-
-            // Delegate position and rotation calculations
-            Vector3 interpolatedPosition = EvaluatePosition(currentSnapshot, nextSnapshot, t, duration);
-            Quaternion interpolatedRotation = EvaluateRotation(currentSnapshot, nextSnapshot, t);
-
-            result = new OrientationData(interpolatedPosition, interpolatedRotation);
-            return true;
-        }
-
-        /// <summary>
-        /// Evaluates position interpolation using the Vector3SplineSolver framework.
-        /// </summary>
-        private Vector3 EvaluatePosition(OrientationSnapshot current, OrientationSnapshot next, float t, float duration)
+        private Vector3 EvaluatePosition(OrientationSnapshot snapshot, float t)
         {
             Vector3SplineSnapshot splineSnapshot = new Vector3SplineSnapshot(
-                current.startState.positionData,
-                current.endVelocity,
-                next.startState.positionData,
-                next.startVelocity,
-                duration
+                snapshot.startState.positionData,
+                snapshot.startVelocity,
+                snapshot.endState.positionData,
+                snapshot.endVelocity,
+                snapshot.Duration
             );
 
             return Vector3SplineSolver.Evaluate(splineSnapshot, t);
         }
 
-        /// <summary>
-        /// Evaluates rotation interpolation using the RotationReconciliation shortest-path slerp.
-        /// </summary>
-        private Quaternion EvaluateRotation(OrientationSnapshot current, OrientationSnapshot next, float t)
+        private Quaternion EvaluateRotation(OrientationSnapshot snapshot, float t)
         {
             return RotationReconciliation.ShortestPathSlerp(
-                current.startState.rotationData,
-                next.startState.rotationData,
+                snapshot.startState.rotationData,
+                snapshot.endState.rotationData,
                 Mathf.Clamp01(t)
             );
         }
-        #endregion Methods
     }
 }
