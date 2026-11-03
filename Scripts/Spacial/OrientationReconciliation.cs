@@ -8,27 +8,45 @@ namespace BugFreeProductions.Spatial
 {
     /// <summary>
     /// Manages the snapshot interpolation buffer, coordinates position splines, 
-    /// and delegates rotation smoothing to specialized evaluation methods.
+    /// and updates the transform position and rotation in LateUpdate.
     /// </summary>
-    public class OrientationReconciliation
+    public class OrientationReconciliation : MonoBehaviour
     {
         #region Fields
-        private readonly LinkedList<OrientationSnapshot> snapshotBuffer;
-        private readonly int maxBufferSize;
-        private readonly float interpolationDelay;
+        [Header("Configuration")]
+        [SerializeField, Tooltip("Maximum number of snapshots to keep in the buffer.")]
+        private int maxBufferSize = 20;
+
+        [SerializeField, Tooltip("Interpolation delay buffer time in seconds to absorb network jitter.")]
+        private float interpolationDelay = 0.1f;
+
+        [SerializeField, Tooltip("Target transform to apply the interpolated orientation to. Defaults to this transform.")]
+        private Transform targetTransform;
+
+        private LinkedList<OrientationSnapshot> snapshotBuffer;
         #endregion Fields
 
-        #region Constructors
-        /// <summary>
-        /// Initializes a new instance of the OrientationReconciliation manager.
-        /// </summary>
-        public OrientationReconciliation(int bufferSize = 20, float delay = 0.1f)
+        #region Unity Lifecycle
+        private void Awake()
         {
             snapshotBuffer = new LinkedList<OrientationSnapshot>();
-            maxBufferSize = bufferSize;
-            interpolationDelay = delay;
+
+            if (targetTransform == null)
+            {
+                targetTransform = transform;
+            }
         }
-        #endregion Constructors
+
+        private void LateUpdate()
+        {
+            // Automatically drive interpolation every frame using local time
+            if (Evaluate(Time.time, out OrientationData result))
+            {
+                targetTransform.position = result.positionData;
+                targetTransform.rotation = result.rotationData;
+            }
+        }
+        #endregion Unity Lifecycle
 
         #region Methods
         /// <summary>
@@ -71,8 +89,8 @@ namespace BugFreeProductions.Spatial
 
             float targetTime = currentTime - interpolationDelay;
 
-            // Prune old snapshots that are completely behind the target render window
-            while (snapshotBuffer.Count > 2 && snapshotBuffer.First.Next.Value.endTime <= targetTime)
+            // Safely prune snapshots that are older than our target window, ensuring we keep at least 2
+            while (snapshotBuffer.Count > 2 && snapshotBuffer.First.Next.Value.endTime < targetTime)
             {
                 snapshotBuffer.RemoveFirst();
             }
@@ -80,7 +98,14 @@ namespace BugFreeProductions.Spatial
             OrientationSnapshot currentSnapshot = snapshotBuffer.First.Value;
             OrientationSnapshot nextSnapshot = snapshotBuffer.First.Next.Value;
 
-            // If target time is ahead of our buffer, clamp to the newest available state
+            // If target time is behind the current snapshot, clamp to start
+            if (targetTime <= currentSnapshot.startTime)
+            {
+                result = currentSnapshot.startState;
+                return true;
+            }
+
+            // If target time is ahead of the next snapshot, use the next snapshot's start/end safely instead of clamping out
             if (targetTime >= nextSnapshot.endTime)
             {
                 result = nextSnapshot.endState;
@@ -88,7 +113,7 @@ namespace BugFreeProductions.Spatial
             }
 
             // Calculate duration and normalized time (t)
-            float duration = nextSnapshot.startTime - currentSnapshot.startTime;
+            float duration = nextSnapshot.endTime - currentSnapshot.startTime;
             if (duration <= 0.0001f)
             {
                 result = nextSnapshot.startState;
@@ -97,7 +122,7 @@ namespace BugFreeProductions.Spatial
 
             float t = (targetTime - currentSnapshot.startTime) / duration;
 
-            // Delegate position and rotation calculations to specialized sub-methods
+            // Delegate position and rotation calculations
             Vector3 interpolatedPosition = EvaluatePosition(currentSnapshot, nextSnapshot, t, duration);
             Quaternion interpolatedRotation = EvaluateRotation(currentSnapshot, nextSnapshot, t);
 

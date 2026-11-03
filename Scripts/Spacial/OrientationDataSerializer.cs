@@ -3,6 +3,7 @@
 
 
 using System;
+using System.Collections;
 using UnityEngine;
 
 namespace BugFreeProductions.Spatial
@@ -119,9 +120,10 @@ namespace BugFreeProductions.Spatial
         /// <summary>
         /// Deserializes a 13-byte network buffer back into an AbsoluteOrientationDataPacket struct.
         /// </summary>
-        public static AbsoluteOrientationDataPacket DeserializePackage(byte[] buffer)
+        public static AbsoluteOrientationDataPacket DeserializePackage(byte[] payload)
         {
-            if (buffer == null || buffer.Length < PayloadSize)
+            //Debug.Log($"[Serializer] Deserializing payload of length: {(payload != null ? payload.Length : 0)}");
+            if (payload == null || payload.Length < PayloadSize)
             {
                 throw new ArgumentException($"Buffer is too small to deserialize AbsoluteOrientationDataPacket. Expected at least {PayloadSize} bytes.");
             }
@@ -129,23 +131,23 @@ namespace BugFreeProductions.Spatial
             int offset = 0;
 
             // 1. Read Position Data (6 bytes: 3 shorts)
-            short x = BitConverter.ToInt16(buffer, offset);
+            short x = BitConverter.ToInt16(payload, offset);
             offset += 2;
-            short y = BitConverter.ToInt16(buffer, offset);
+            short y = BitConverter.ToInt16(payload, offset);
             offset += 2;
-            short z = BitConverter.ToInt16(buffer, offset);
+            short z = BitConverter.ToInt16(payload, offset);
             offset += 2;
 
             AbsolutePositionDataPacket posPacket = new AbsolutePositionDataPacket(x, y, z);
 
             // 2. Read Rotation Data (7 bytes: 3 shorts + 1 byte index)
-            short rx = BitConverter.ToInt16(buffer, offset);
+            short rx = BitConverter.ToInt16(payload, offset);
             offset += 2;
-            short ry = BitConverter.ToInt16(buffer, offset);
+            short ry = BitConverter.ToInt16(payload, offset);
             offset += 2;
-            short rz = BitConverter.ToInt16(buffer, offset);
+            short rz = BitConverter.ToInt16(payload, offset);
             offset += 2;
-            byte largestIndex = buffer[offset++];
+            byte largestIndex = payload[offset++];
 
             AbsoluteRotationDataPacket rotPacket = new AbsoluteRotationDataPacket(rx, ry, rz, largestIndex);
 
