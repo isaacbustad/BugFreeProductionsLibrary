@@ -15,6 +15,10 @@ namespace BugFreeProductions.Spatial
         [Header("Default Timing")]
         [SerializeField] private float defaultTickDuration = 0.05f; 
 
+        [Header("Stationary Filtering")]
+        [SerializeField, Tooltip("Deadzone threshold to filter out sub-millimeter physics solver noise when held still.")]
+        private float stationaryThreshold = 0.0005f;
+
         // FIFO queue matching the VisualSplineUpdater pattern
         private LinkedList<OrientationSnapshot> snapshotBuffer = new LinkedList<OrientationSnapshot>();
         
@@ -23,6 +27,11 @@ namespace BugFreeProductions.Spatial
 
         // Track velocities to maintain C^1 continuity across segments
         private Vector3 lastTargetVelocity = Vector3.zero;
+
+        // Latch fields to eliminate stationary physics jitter
+        private Vector3 lastStablePosition;
+        private Quaternion lastStableRotation;
+        private bool isLatched = false;
 
         private void Awake()
         {
@@ -38,6 +47,8 @@ namespace BugFreeProductions.Spatial
             {
                 transform.position = physicalBodyTarget.position;
                 transform.rotation = physicalBodyTarget.rotation;
+                lastStablePosition = transform.position;
+                lastStableRotation = transform.rotation;
             }
         }
 
@@ -60,7 +71,6 @@ namespace BugFreeProductions.Spatial
                 }
             }
 
-            
             OrientationData startState;
             Vector3 startVelocity = lastTargetVelocity;
 
@@ -105,11 +115,13 @@ namespace BugFreeProductions.Spatial
                 activeSnapshot = snapshotBuffer.First.Value;
                 snapshotBuffer.RemoveFirst();
                 elapsedSnapshotTime = 0f;
+                isLatched = false; // Unlatch when a new movement segment starts
             }
 
             // 2. Evaluate active snapshot using smooth spline (position) and slerp (rotation)
             if (activeSnapshot.HasValue)
             {
+                isLatched = false;
                 elapsedSnapshotTime += Time.fixedDeltaTime;
                 float duration = activeSnapshot.Value.Duration;
                 
@@ -131,12 +143,32 @@ namespace BugFreeProductions.Spatial
 
                 transform.position = interpolatedPosition;
                 transform.rotation = interpolatedRotation;
+
+                lastStablePosition = interpolatedPosition;
+                lastStableRotation = interpolatedRotation;
             }
-            // 3. Fallback: When buffer is empty, track the physical body directly without micro-lerp friction
+            // 3. Fallback: When buffer is empty, apply stationary deadzone latch to ignore PhysX solver noise
             else
             {
-                transform.position = physicalBodyTarget.position;
-                transform.rotation = physicalBodyTarget.rotation;
+                float sqrDist = (physicalBodyTarget.position - lastStablePosition).sqrMagnitude;
+                float angleDiff = Quaternion.Angle(transform.rotation, physicalBodyTarget.rotation);
+
+                if (sqrDist > stationaryThreshold * stationaryThreshold || angleDiff > 0.1f || !isLatched)
+                {
+                    transform.position = physicalBodyTarget.position;
+                    transform.rotation = physicalBodyTarget.rotation;
+
+                    lastStablePosition = transform.position;
+                    lastStableRotation = transform.rotation;
+                    isLatched = true;
+                }
+                else
+                {
+                    // Lock transform completely still against micro-wiggles
+                    transform.position = lastStablePosition;
+                    transform.rotation = lastStableRotation;
+                }
+
                 lastTargetVelocity = Vector3.zero;
             }
         }
@@ -147,6 +179,7 @@ namespace BugFreeProductions.Spatial
             activeSnapshot = null;
             elapsedSnapshotTime = 0f;
             lastTargetVelocity = Vector3.zero;
+            isLatched = false;
         }
 
         private Vector3 EvaluatePosition(OrientationSnapshot snapshot, float t)
