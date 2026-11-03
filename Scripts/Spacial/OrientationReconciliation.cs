@@ -133,15 +133,15 @@ namespace BugFreeProductions.Spatial
                 transform.rotation = interpolatedRotation;
             }
             // 3. Fallback: Smooth exponential decay toward physical target to eliminate solver noise without snapping
-            else
-            {
-                float blendFactor = 1f - Mathf.Exp(-idleDamping * Time.fixedDeltaTime);
+            // else
+            // {
+            //     float blendFactor = 1f - Mathf.Exp(-idleDamping * Time.fixedDeltaTime);
 
-                transform.position = Vector3.Lerp(transform.position, physicalBodyTarget.position, blendFactor);
-                transform.rotation = Quaternion.Slerp(transform.rotation, physicalBodyTarget.rotation, blendFactor);
+            //     transform.position = Vector3.Lerp(transform.position, physicalBodyTarget.position, blendFactor);
+            //     transform.rotation = Quaternion.Slerp(transform.rotation, physicalBodyTarget.rotation, blendFactor);
 
-                lastTargetVelocity = Vector3.zero;
-            }
+            //     lastTargetVelocity = Vector3.zero;
+            // }
         }
 
         public void Clear()
