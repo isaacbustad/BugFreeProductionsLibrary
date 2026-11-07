@@ -33,6 +33,14 @@ namespace BugFreeProductions.Spatial
         {
             return new OrientationData(aTF.position,aTF.rotation);
         }
+
+
+        // SET: Applies position and rotation directly to the transform
+        public static void OrientationData(this Transform aTF, OrientationData data)
+        {
+            aTF.position = data.positionData;
+            aTF.rotation = data.rotationData;
+        }
         #endregion Methods
     }
 }
